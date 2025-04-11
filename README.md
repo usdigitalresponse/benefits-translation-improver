@@ -30,7 +30,6 @@ This will perform the following actions:
 
 1. Translate the English text in `samples/test1/source.txt` to Mexican Spanish using Amazon Translate
   and save the result to `samples/test1/es-MX/translation.txt`.
-
   **Note:** If a file already exists at `samples/test1/es-MX/translation.txt`, this step will be skipped.
 
 2. Generate an assessment of the translation in `samples/test1/es-MX/translation.txt` using Claude (via Amazon Bedrock)
