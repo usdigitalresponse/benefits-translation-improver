@@ -32,6 +32,7 @@ This will perform the following actions:
   and save the result to `samples/test1/es-MX/translation.txt`.
 
   **Note:** If a file already exists at `samples/test1/es-MX/translation.txt`, this step will be skipped.
+
 2. Generate an assessment of the translation in `samples/test1/es-MX/translation.txt` using Claude (via Amazon Bedrock)
   and save the assessment JSON to `samples/test1/es-MX/assessment-DATETIME/assessment.json`
   (note: `DATETIME` will be substituted for the actual current datetime).
