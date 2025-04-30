@@ -55,6 +55,8 @@ class SupportedLanguagesCache:
     def __init__(self, items: typing.Sequence[LanguageTypeDef] = ()):
         self._items_by_code: dict[str, LanguageTypeDef] = {}
         self._items_by_name: dict[str, LanguageTypeDef] = {}
+        if len(items) > 0:
+            self.add_items(*items)
 
     def size(self):
         return len(self._items_by_code)
@@ -71,7 +73,7 @@ class SupportedLanguagesCache:
         return code.lower() in self._items_by_code.keys()
 
     def normalize_code(self, code: str) -> str | None:
-        return item["LanguageCode"] if (item := self._items_by_code.get(code)) else None
+        return item["LanguageCode"] if (item := self._items_by_code.get(code.lower())) else None
 
     def get_code_from_name(self, name: str) -> str | None:
         return item["LanguageCode"] if (item := self._items_by_name.get(name.lower())) else None
