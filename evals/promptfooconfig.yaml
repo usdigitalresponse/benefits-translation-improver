@@ -4,6 +4,8 @@
 
 description: "My eval"
 
+# We can make this reference our latest prompt file by replacing the below with
+# - file://path/to/prompt
 prompts:
   - "Translate this text to Spanish: {{text}}"
   
@@ -13,6 +15,10 @@ providers:
   - "openai:gpt-4o"
   - "anthropic:messages:claude-3-7-sonnet-latest"
 
+# We can put our tests in a csv file and refer to them below like
+# - file://path/to/tests_csv
+# Alternatively, we can put them in a public Google sheet and link the URL,
+# Or a private sheet if we set up a service account in Google Cloud
 tests:
   - vars:
       text: |
