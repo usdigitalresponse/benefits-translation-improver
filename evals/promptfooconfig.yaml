@@ -5,36 +5,24 @@
 description: "My eval"
 
 prompts:
-  - "Write a tweet about {{topic}}"
-  - "Write a concise, funny tweet about {{topic}}"
+  - "Translate this text to Spanish: {{text}}"
   
 
 providers:
   - "openai:gpt-4o-mini"
   - "openai:gpt-4o"
-  
+  - "anthropic:messages:claude-3-7-sonnet-latest"
 
 tests:
   - vars:
-      topic: bananas
-
-  - vars:
-      topic: avocado toast
+      text: |
+        If you appeal your decision/determination it can be affirmed, modified, or reversed. 
+        If it is affirmed, it means no changes have been made to the existing decision.
     assert:
-      # For more information on assertions, see https://promptfoo.dev/docs/configuration/expected-outputs
-
-      # Make sure output contains the word "avocado"
       - type: icontains
-        value: avocado
-
-      # Prefer shorter outputs
-      - type: javascript
-        value: 1 / (output.length + 1)
-
-  - vars:
-      topic: new york city
-    assert:
-      # For more information on model-graded evals, see https://promptfoo.dev/docs/configuration/expected-outputs/model-graded
+        value: apela
+      - type: icontains
+        value: modificada
       - type: llm-rubric
-        value: ensure that the output is funny
+        value: Make sure the output is clear to a reader at a 9th grade reading level
 
