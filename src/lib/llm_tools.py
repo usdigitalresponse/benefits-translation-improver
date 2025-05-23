@@ -13,10 +13,9 @@ class Tool(pydantic.BaseModel, abc.ABC):
     NAME: typing.ClassVar[str] = NotImplemented
     DESCRIPTION: typing.ClassVar[str] = NotImplemented
 
-    class Config:
-        @staticmethod
-        def model_title_generator(cls: type[Tool]) -> str:
-            return cls.NAME
+    model_config = pydantic.ConfigDict(
+        model_title_generator=lambda cls: cls.NAME,
+    )
 
     @classmethod
     def as_toolspec(cls) -> mypy_boto3_bedrock_runtime.type_defs.ToolTypeDef:
