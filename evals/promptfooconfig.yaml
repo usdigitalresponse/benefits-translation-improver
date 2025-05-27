@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Learn more about building a configuration: https://promptfoo.dev/docs/configuration/guide
+
+description: "My eval"
+
+# We can make this reference our latest prompt file by replacing the below with
+# - file://path/to/prompt
+prompts:
+  - "Translate this text to Spanish: {{text}}"
+  
+
+providers:
+  - "openai:gpt-4o-mini"
+  - "openai:gpt-4o"
+  - "anthropic:messages:claude-3-7-sonnet-latest"
+
+# We can put our tests in a csv file and refer to them below like
+# - file://path/to/tests_csv
+# Alternatively, we can put them in a public Google sheet and link the URL,
+# Or a private sheet if we set up a service account in Google Cloud
+tests:
+  - vars:
+      text: |
+        If you appeal your decision/determination it can be affirmed, modified, or reversed. 
+        If it is affirmed, it means no changes have been made to the existing decision.
+    assert:
+      - type: icontains
+        value: apela
+      - type: icontains
+        value: modificada
+      - type: llm-rubric
+        value: Make sure the output is clear to a reader at a 9th grade reading level
+
