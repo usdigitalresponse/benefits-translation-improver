@@ -15,20 +15,6 @@ providers:
   - "openai:gpt-4o"
   - "anthropic:messages:claude-3-7-sonnet-latest"
 
-# We can put our tests in a csv file and refer to them below like
-# - file://path/to/tests_csv
-# Alternatively, we can put them in a public Google sheet and link the URL,
-# Or a private sheet if we set up a service account in Google Cloud
-tests:
-  - vars:
-      text: |
-        If you appeal your decision/determination it can be affirmed, modified, or reversed. 
-        If it is affirmed, it means no changes have been made to the existing decision.
-    assert:
-      - type: icontains
-        value: apela
-      - type: icontains
-        value: modificada
-      - type: llm-rubric
-        value: Make sure the output is clear to a reader at a 9th grade reading level
+# The sheet here needs to be visible to anyone with the link
+tests: https://docs.google.com/spreadsheets/d/1D7KqQuLMJ9D1Np0VYWPQL7ibDJbtfwoHRzJdCdUcp8M/edit?gid=0#gid=0
 
