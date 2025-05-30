@@ -1137,6 +1137,17 @@ files = [
 wcwidth = "*"
 
 [[package]]
+name = "promptfoo"
+version = "0.1.0"
+description = "LLM evals and red teaming"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "promptfoo-0.1.0-py3-none-any.whl", hash = "sha256:1f246b22f6d3af997a501cdf480c13543c6639734f3321d9acc5a4529eef5d2f"},
+    {file = "promptfoo-0.1.0.tar.gz", hash = "sha256:44a3ad4b90bdb720ed28268dd4fba5263ca1ff0061f261775d36a0b1e1faa4b4"},
+]
+
+[[package]]
 name = "ptyprocess"
 version = "0.7.0"
 description = "Run a subprocess in a pseudo terminal"
@@ -1609,4 +1620,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.13"
-content-hash = "a77f36dec5b5feaee55a7af923a8b6a159e8898867608d7fa02e3706a9f1c61d"
+content-hash = "c8c5e7227fecab7f7c8dbb91cd4f3c74e4f8ba37b4919ecf406353e46fda6a98"
