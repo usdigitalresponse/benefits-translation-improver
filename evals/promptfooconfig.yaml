@@ -7,13 +7,13 @@ description: "My eval"
 # We can make this reference our latest prompt file by replacing the below with
 # - file://path/to/prompt
 prompts:
-  - "Translate this text to Spanish: {{text}}"
-  
+  - file://prompt.txt
 
 providers:
-  - "openai:gpt-4o-mini"
-  - "openai:gpt-4o"
-  - "anthropic:messages:claude-3-7-sonnet-latest"
+  - openai:gpt-4o-mini
+  - openai:gpt-4o
+  - anthropic:messages:claude-sonnet-4-20250514
+  - google:gemini-2.5-flash-preview-04-17
 
 # The sheet here needs to be visible to anyone with the link
 tests: https://docs.google.com/spreadsheets/d/1D7KqQuLMJ9D1Np0VYWPQL7ibDJbtfwoHRzJdCdUcp8M/edit?gid=0#gid=0

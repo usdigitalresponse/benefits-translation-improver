@@ -1,0 +1,8 @@
+{
+  "name": "translation-evals",
+  "private": true,
+  "scripts": {
+    "eval": "promptfoo eval -c evals/promptfooconfig.yaml --no-cache",
+    "eval-view": "promptfoo view"
+  }
+}
