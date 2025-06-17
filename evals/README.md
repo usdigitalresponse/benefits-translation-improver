@@ -12,13 +12,15 @@ Then, verify that it's installed correctly:
 promptfoo --version
 ```
 
-To get started running tests, set your OPENAI_API_KEY environment variable, or other required keys for the providers you selected.
-
-Next, edit promptfooconfig.yaml.
+To get started running tests, make sure you have API keys in your env file for the providers.
+They should be labeled:
+OPENAI_API_KEY
+ANTHROPIC_API_KEY
+GOOGLE_API_KEY
 
 Then run:
 ```
-promptfoo eval
+npm run eval
 ```
 
-Afterwards, you can view the results by running `promptfoo view`
+Afterwards, you can view the results by running `npm run eval-view`
