@@ -1,0 +1,28 @@
+Translate the following English terms and definitions into Spanish, ensuring the translation adheres to the following criteria. Pay close attention to the priority levels and specific instructions for each category. Failing to accurately translate these terms could lead to misunderstandings and incorrect benefit calculations. It is crucial that the translation is both accurate and culturally appropriate for Spanish-speaking individuals in the US.
+Translation Criteria:
+1. Accuracy and Relevance (Highest Priority)
+1.1 Accurate Translation: The translation must accurately convey the precise meaning and nuances of the English term within the context of SNAP benefits in AZ. Retain commonly understood English terms (e.g., email) and, when translating well-known concepts, provide both the Spanish translation and the English term in parentheses (e.g., "permiso de residencia ("Green Card")"). Avoid any mistranslations or omissions that could change the intended meaning.
+1.2 Legal Compliance: The translation must adhere to relevant laws, regulations, and legal terminology  but explain them in plain language understandable to Spanish speakers. Avoid using overly technical legal jargon.
+1.3 SNAP Specific: The translation must use terminology consistent with other SNAP materials. Avoid general terms that could be misinterpreted and reflect common usage in SNAP contexts for Spanish-speaking individuals in the US.
+1.4 Contextual Understanding: Pay close attention to the context surrounding each term and definition to ensure the translation is accurate and appropriate.
+2. Clarity and Simplicity (High Priority)
+2.1 Plain Language: Use everyday words and phrases that a native Spanish speaker with an 6th-grade reading level would easily understand. Avoid overly literal translations that might sound awkward or unnatural in Spanish in the SNAP benefits context (e.g., translating "discharged" as "descargado," which has a different meaning).
+2.2 Concise: Sentences should be short, direct, and easy to follow, averaging 15-20 words per sentence, or even shorter when possible.
+2.3 Jargon-Free: Technical jargon and legal terms should be avoided entirely or explained in the simplest possible terms using language familiar to Spanish speakers.
+2.4 Examples: Provide clear, relatable examples to illustrate complex concepts or terms.
+3. Active Voice and Conversational Tone (Medium Priority)
+3.1 Active Voice: Prioritize active voice to clearly indicate who is taking action. The subject of the sentence should be the person performing the action (e.g., "You must file your claim weekly" to "Usted debe presentar su reclamo semanalmente").
+3.2 Conversational: The language should be friendly and informal, as if you were explaining the concept to a friend in person (e.g., "We understand this can be a stressful time. We're here to help." to "Sabemos que este puede ser un momento estresante. Estamos aquí para ayudarlo/a.").
+3.3 Personal Pronouns: Use personal pronouns like "usted" (you) and "nosotros" (we, referring to the Department of Economic Security) to create a direct and personal connection with the reader.
+3.4 Idiomatic Expressions: Incorporate common Spanish idioms and expressions where appropriate to make the language sound more natural and relatable to native speakers.
+4. Cultural Sensitivity and Tone (High Priority)
+4.1 Formal Address: While maintaining a conversational tone, consistently use the formal "usted" form of address.
+4.2 Gender Neutral: Use gender-neutral language. Prioritize referring to groups rather than individuals and use nouns instead of gendered adjectives (e.g., "el grupo de trabajadores" instead of "los trabajadores," "Persona propietaria" instead of "dueño") or using non personal forms (e.g. "es necesario completar" instead of "el solicitante debe completar"). When alternatives aren't possible, combine masculine and feminine forms using "o/a" (e.g., "preparado/a").
+4.3 Latin American Vocabulary: Prioritize vocabulary commonly used in Latin American Spanish, avoiding regionalisms and ensuring clarity for all readers. Include synonyms to ensure understanding across Latin America (example: "jubilación" and "pensión" both mean "retirement").
+4.4 Cultural Equivalents: Some SNAP benefit terms might have no direct equivalent in Spanish due to cultural or legal differences in social safety nets. Provide the closest cultural equivalent or a clear explanation in plain Spanish if a direct translation isn't possible. (e.g., "willful or negligent misconduct" might be translated as "conducta indebida intencional (o a propósito)" or  as "conducta negligente")
+4.5 Respectful Tone: Maintain a respectful and supportive tone towards the reader, acknowledging the challenges they may be facing.
+5. Consistency and Style (Medium Priority)
+5.1 Consistent Terminology: Use the same Spanish term consistently to translate a specific English term throughout the SNAP materials, ensuring a unified and clear message.
+5.2 Consistent Style: Follow a consistent style guide for formatting, punctuation, and capitalization that aligns with standard Spanish usage.
+Please provide a Spanish translation that adheres to all the criteria outlined above.
+Text to translate: {{text}}
