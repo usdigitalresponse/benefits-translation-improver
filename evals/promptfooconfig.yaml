@@ -14,6 +14,14 @@ providers:
   - anthropic:messages:claude-sonnet-4-20250514
   - google:gemini-2.5-flash-preview-04-17
 
-# The sheet here needs to be visible to anyone with the link
-tests: https://docs.google.com/spreadsheets/d/1D7KqQuLMJ9D1Np0VYWPQL7ibDJbtfwoHRzJdCdUcp8M/edit?gid=0#gid=0
+# The sheets here needs to be visible to anyone with the link
+# For readability's sake, it is best if we uncomment each link and run individually so each test run
+# can have its own view. You _can_ run them all together, but it results in a huge list of cases
+tests:
+  # Accuracy (NLP + embedding metrics)
+#  - https://docs.google.com/spreadsheets/d/1D7KqQuLMJ9D1Np0VYWPQL7ibDJbtfwoHRzJdCdUcp8M/edit?gid=0#gid=0
+  # Qualitative (LLM based metrics)
+#  - https://docs.google.com/spreadsheets/d/1XT0SSng1P7qGM5GCSOdjNdqmOuxOXeWGQRguGm-Tftw/edit?gid=0#gid=0
+  # Quantitative LLM performance (latency etc)
+  - https://docs.google.com/spreadsheets/d/1VXBvSrOjzt5da_rS3MGp9pvan2oyeXhCVxooM-t77w8/edit?gid=0#gid=0
 
