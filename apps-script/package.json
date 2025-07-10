@@ -1,0 +1,19 @@
+{
+  "name": "apps-script",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "clasp": "clasp",
+    "login": "clasp login",
+    "push": "clasp push",
+    "run": "clasp run translationApp",
+    "logs": "clasp logs --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@google/clasp": "^3.0.6-alpha"
+  }
+}
