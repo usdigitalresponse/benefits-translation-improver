@@ -5,9 +5,7 @@
   "scripts": {
     "clasp": "clasp",
     "login": "clasp login",
-    "push": "clasp push",
-    "run": "clasp run translationApp",
-    "logs": "clasp logs --watch"
+    "push": "clasp push"
   },
   "keywords": [],
   "author": "",
