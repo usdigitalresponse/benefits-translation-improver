@@ -38,13 +38,40 @@ function markAsProcessed(file) {
 }
 
 /**
- * Utility function to get folder IDs (run this to find your folder IDs)
+ * Find the required translation folders by name (run this to find your folder IDs to plug into config.js)
  */
 function getFolderIds() {
-  const folders = DriveApp.getFolders();
-  console.log('Available folders:');
-  while (folders.hasNext()) {
-    const folder = folders.next();
-    console.log(`Folder: ${folder.getName()} - ID: ${folder.getId()}`);
-  }
+  const requiredFolders = ['Docs_To_Translate', 'Translated_Docs', 'Translation_Context'];
+  
+  console.log('Finding translation folders...\n');
+
+  requiredFolders.forEach(folderName => {
+    console.log(`Looking for: ${folderName}`);
+    const folders = DriveApp.getFoldersByName(folderName);
+    
+    if (!folders.hasNext()) {
+      console.log(`  ❌ NOT FOUND - Please create a folder named "${folderName}"`);
+    } else {
+      const foundFolders = [];
+      while (folders.hasNext()) {
+        foundFolders.push(folders.next());
+      }
+      
+      if (foundFolders.length === 1) {
+        const folder = foundFolders[0];
+        console.log(`  ✅ ${folder.getName()} - ID: ${folder.getId()}`);
+      } else {
+        console.log(`  ⚠️  Found ${foundFolders.length} folders with this name:`);
+        foundFolders.forEach(folder => {
+          console.log(`     ${folder.getName()} - ID: ${folder.getId()} (Created: ${folder.getDateCreated()})`);
+        });
+      }
+    }
+    console.log('');
+  });
+  
+  console.log('Copy the IDs above into your config.js file:');
+  console.log('- SOURCE_FOLDER_ID: Use the ID for "Docs_To_Translate"');
+  console.log('- OUTPUT_FOLDER_ID: Use the ID for "Translated_Docs"'); 
+  console.log('- CONTEXT_FOLDER_ID: Use the ID for "Translation_Context"');
 }

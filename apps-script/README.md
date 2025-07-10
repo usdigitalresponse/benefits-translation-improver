@@ -52,3 +52,14 @@ user-managed Google Cloud Platform project. For simplicity's sake, we are not pl
 ## Testing
 
 Run and test functions directly in the Apps Script editor at script.google.com for the best debugging experience.
+
+After creating the project and pushing to your Google workspace:
+1. Load the script
+2. In config.js, add in your API key(s)
+3. Create a parent folder for the TranslationApp files. Within that folder, create three sub-folders: Docs_to_Translate, Translated_Docs and Translation_Content. Copy each of these IDs into the relevant property in config.js
+5. If you've already created the folders and need the IDs, you can run the `getFolderIds` method in `drive.js` to find your folder IDs and copy them over.
+6. Add the custom prompt to the Translation_Context folder, named Translate_Prompt
+7. Run the `setupTrigger` method in `main.js` to add the trigger to listen for new files
+8. Add a new file to be translated in Docs_To_Translate
+9. Wait up to 2 minutes and see the translation in Translated_Docs
+10. Run the utility method `removeTrigger` in `main.js` to remove the trigger (optional, but just in case you don't want it listening forever)

@@ -2,14 +2,14 @@
  * Set up the drive trigger to "listen" for file added events.
  * Sadly there's no option to install it for a particular folder,
  * so we have to listen to all folders, and then we check the folder id
- * in onFileAdded below.
+ * in translateOnFileAdded below.
  *
  * Run this function once to install the trigger.
  */
 function setupTrigger() {
   const triggers = ScriptApp.getProjectTriggers();
   triggers.forEach(trigger => {
-    if (trigger.getHandlerFunction() === 'onFileAdded') {
+    if (trigger.getHandlerFunction() === 'translateOnFileAdded') {
       ScriptApp.deleteTrigger(trigger);
     }
   });
