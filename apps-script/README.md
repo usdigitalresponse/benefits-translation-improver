@@ -63,3 +63,9 @@ After creating the project and pushing to your Google workspace:
 8. Add a new file to be translated in Docs_To_Translate
 9. Wait up to 2 minutes and see the translation in Translated_Docs
 10. Run the utility method `removeTrigger` in `main.js` to remove the trigger (optional, but just in case you don't want it listening forever)
+
+## System Status Markers
+You have various utility methods available in `utils.js` to verify the status of the system:
+- `validateConfiguration` - checks if all the necessary config properties are set for the script to run successfully
+- `getSystemStatus` - checks configuration, triggers and folders
+- `resetProcessedMarkers` - in case you want to mark the files in the source folder as "unprocessed" to translate again
