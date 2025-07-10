@@ -45,7 +45,7 @@ function getSystemStatus() {
   // Check triggers
   console.log('\n2. Triggers:');
   const triggers = ScriptApp.getProjectTriggers();
-  const translationTriggers = triggers.filter(t => t.getHandlerFunction() === 'onFileAdded');
+  const translationTriggers = triggers.filter(t => t.getHandlerFunction() === CONFIG.TRIGGER_NAME);
   console.log(`Active translation triggers: ${translationTriggers.length}`);
   
   // Check folders accessibility

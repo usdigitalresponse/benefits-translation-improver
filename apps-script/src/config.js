@@ -12,7 +12,8 @@ const CONFIG = {
   TEMPERATURE: 0.3,
   
   // Processing settings
-  TRIGGER_INTERVAL_MINUTES: 2,
+  TRIGGER_INTERVAL_MINUTES: 5,
   PROCESSED_MARKER: 'TRANSLATED',
-  PROMPT_DOCUMENT_NAME: 'Translate_Prompt'
+  PROMPT_DOCUMENT_NAME: 'Translate_Prompt',
+  TRIGGER_NAME: 'translateOnFileAdded'
 };

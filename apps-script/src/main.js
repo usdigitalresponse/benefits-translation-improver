@@ -9,12 +9,12 @@
 function setupTrigger() {
   const triggers = ScriptApp.getProjectTriggers();
   triggers.forEach(trigger => {
-    if (trigger.getHandlerFunction() === 'translateOnFileAdded') {
+    if (trigger.getHandlerFunction() === CONFIG.TRIGGER_NAME) {
       ScriptApp.deleteTrigger(trigger);
     }
   });
   
-  ScriptApp.newTrigger('translateOnFileAdded')
+  ScriptApp.newTrigger(CONFIG.TRIGGER_NAME)
     .timeBased()
     .everyMinutes(CONFIG.TRIGGER_INTERVAL_MINUTES)
     .create();
@@ -28,7 +28,7 @@ function setupTrigger() {
 function removeTrigger() {
   const triggers = ScriptApp.getProjectTriggers();
   triggers.forEach(trigger => {
-    if (trigger.getHandlerFunction() === 'translateOnFileAdded') {
+    if (trigger.getHandlerFunction() === CONFIG.TRIGGER_NAME) {
       ScriptApp.deleteTrigger(trigger);
       console.log('Trigger removed successfully');
     }
