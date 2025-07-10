@@ -36,12 +36,16 @@ A Google Apps Script for translation functionality, leveraging Google Drive fold
 - `npm run login` - Authenticate with Google Apps Script
 - `npm run clasp create` - Create a project for the script (for first time users, if you don't have one already)
 
-**Note:** `npm run run` and `npm run logs` (e.g. running the app and viewing logs remotely) require linking to a 
+**Note:** `npm run clasp run` and `npm run clasp logs` (e.g. running the app and viewing logs remotely) require linking to a 
 user-managed Google Cloud Platform project. For simplicity's sake, we are not planning to do this, so browser testing is recommended.
 
 ## File Structure
 
-- `src/translationApp.js` - Main application code
+- `src/main.js` - Entry points, trigger setups and utility methods
+- `src/config.js` - Configuration constants and settings
+- `src/drive.js` - Google Drive operations and file management
+- `src/translation.js` - Core translation logic and LLM API calls
+- `src/utils.js` - System status, validation, etc.
 - `src/appsscript.json` - Apps Script configuration
 - `.clasp.json` - Clasp configuration (auto-generated)
 
