@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Clasp configuration (contains project-specific IDs)
+.clasp.json
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
