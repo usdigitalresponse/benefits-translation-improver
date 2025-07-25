@@ -8,7 +8,6 @@ function createTranslatedDocument(originalName, translation) {
     
     const newDoc = DocumentApp.create(translatedName);
     newDoc.getBody().setText(translation);
-
     const newDocFile = DriveApp.getFileById(newDoc.getId());
     markAsProcessed(newDocFile);
     newDocFile.moveTo(outputFolder);
@@ -40,7 +39,6 @@ function markAsProcessed(file) {
  */
 function getFolderIds() {
   const requiredFolders = ['Translated_Docs', 'Translation_Context'];
-  
   console.log('Finding translation folders...\n');
 
   requiredFolders.forEach(folderName => {
