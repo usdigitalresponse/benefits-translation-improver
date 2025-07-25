@@ -8,12 +8,10 @@ function createTranslatedDocument(originalName, translation) {
     
     const newDoc = DocumentApp.create(translatedName);
     newDoc.getBody().setText(translation);
-    
-    const file = DriveApp.getFileById(newDoc.getId());
-    outputFolder.addFile(file);
-    // Remove from root now that it's in the output folder
-    DriveApp.getRootFolder().removeFile(file);
-    
+
+    const newDocFile = DriveApp.getFileById(newDoc.getId());
+    markAsProcessed(newDocFile);
+    newDocFile.moveTo(outputFolder);
     console.log(`Created translated document: ${translatedName}`);
     
   } catch (error) {
@@ -41,7 +39,7 @@ function markAsProcessed(file) {
  * Find the required translation folders by name (run this to find your folder IDs to plug into config.js)
  */
 function getFolderIds() {
-  const requiredFolders = ['Docs_To_Translate', 'Translated_Docs', 'Translation_Context'];
+  const requiredFolders = ['Translated_Docs', 'Translation_Context'];
   
   console.log('Finding translation folders...\n');
 
@@ -61,9 +59,9 @@ function getFolderIds() {
         const folder = foundFolders[0];
         console.log(`  ✅ ${folder.getName()} - ID: ${folder.getId()}`);
       } else {
-        console.log(`  ⚠️  Found ${foundFolders.length} folders with this name:`);
+        console.log(`⚠️  Found ${foundFolders.length} folders with this name:`);
         foundFolders.forEach(folder => {
-          console.log(`     ${folder.getName()} - ID: ${folder.getId()} (Created: ${folder.getDateCreated()})`);
+          console.log(`${folder.getName()} - ID: ${folder.getId()} (Created: ${folder.getDateCreated()})`);
         });
       }
     }
@@ -71,7 +69,6 @@ function getFolderIds() {
   });
   
   console.log('Copy the IDs above into your config.js file:');
-  console.log('- SOURCE_FOLDER_ID: Use the ID for "Docs_To_Translate"');
-  console.log('- OUTPUT_FOLDER_ID: Use the ID for "Translated_Docs"'); 
+  console.log('- OUTPUT_FOLDER_ID: Use the ID for "Translated_Docs"');
   console.log('- CONTEXT_FOLDER_ID: Use the ID for "Translation_Context"');
 }
