@@ -1,25 +1,40 @@
 /**
- * Set up the drive trigger to "listen" for file added events.
- * Sadly there's no option to install it for a particular folder,
- * so we have to listen to all folders, and then we check the folder id
- * in translateOnFileAdded below.
- *
+ * Set up the form trigger to "listen" for form submitted events.
  * Run this function once to install the trigger.
  */
-function setupTrigger() {
-  const triggers = ScriptApp.getProjectTriggers();
-  triggers.forEach(trigger => {
-    if (trigger.getHandlerFunction() === CONFIG.TRIGGER_NAME) {
-      ScriptApp.deleteTrigger(trigger);
-    }
-  });
+function setupFormTrigger() {
+  if (!CONFIG.TRANSLATION_FORM_ID) {
+    console.error('TRANSLATION_FORM_ID is not set in config.js');
+    return;
+  }
   
-  ScriptApp.newTrigger(CONFIG.TRIGGER_NAME)
-    .timeBased()
-    .everyMinutes(CONFIG.TRIGGER_INTERVAL_MINUTES)
-    .create();
-    
-  console.log('Trigger set up successfully');
+  const form = FormApp.openById(CONFIG.TRANSLATION_FORM_ID)
+  ScriptApp.newTrigger(CONFIG.FORM_TRIGGER_NAME)
+      .forForm(form)
+      .onFormSubmit()
+      .create()
+}
+
+/**
+ * Function that runs when the translation form is submitted
+ * @param {FormSubmitEvent} e
+ * */
+function translateOnFormSubmission(e) {
+  try {
+    // Check if the form submission is from the correct form
+    const formId = e.source.getId();
+    if (formId !== CONFIG.TRANSLATION_FORM_ID) {
+      console.log(`Form submission from unexpected form ID: ${formId}. Expected: ${CONFIG.TRANSLATION_FORM_ID}`);
+      return;
+    }
+
+    const formResponse = e.response;
+    const submissionId = formResponse.getId();
+    console.log(`Translation response ID: ${submissionId}, submitted at ${formResponse.getTimestamp()}, by ${formResponse.getRespondentEmail()}`);
+    translateFormSubmission(submissionId);
+  } catch (error) {
+    console.error('Error in translateOnFormSubmission:', error);
+  }
 }
 
 /**
@@ -28,7 +43,7 @@ function setupTrigger() {
 function removeTrigger() {
   const triggers = ScriptApp.getProjectTriggers();
   triggers.forEach(trigger => {
-    if (trigger.getHandlerFunction() === CONFIG.TRIGGER_NAME) {
+    if (trigger.getHandlerFunction() === CONFIG.FORM_TRIGGER_NAME) {
       ScriptApp.deleteTrigger(trigger);
       console.log('Trigger removed successfully');
     }
@@ -40,39 +55,16 @@ function removeTrigger() {
 }
 
 /**
- * Main function that runs when new files are detected to translate
- */
-function translateOnFileAdded() {
-  try {
-    const sourceFolder = DriveApp.getFolderById(CONFIG.SOURCE_FOLDER_ID);
-    const files = sourceFolder.getFiles();
-    
-    while (files.hasNext()) {
-      const file = files.next();
-      if (file.getMimeType() === MimeType.GOOGLE_DOCS && !hasBeenProcessed(file)) {
-        console.log(`Processing file: ${file.getName()}`);
-        processDocument(file);
-        markAsProcessed(file);
-      }
-    }
-  } catch (error) {
-    console.error('Error in translateOnFileAdded:', error);
-  }
-}
-
-/**
- * This is a utility method you can run to test the translation on a specific document.
- * File in the document ID you want below and then run.
+ * This is a utility method you can run to test the translation on a specific form submission.
+ * File in the form submission ID you want below and then run.
  */
 function testTranslation() {
-  const testDocId = ''; // Replace with a test document ID
-  if (!testDocId) {
-    console.log('Please set a test document ID in the testTranslation function');
+  const testFormSubmissionId = ''; // Replace with a test form submission ID
+  if (!testFormSubmissionId) {
+    console.log('Please set a test form submission ID in the testTranslation function');
     return;
   }
-  
-  const file = DriveApp.getFileById(testDocId);
-  processDocument(file);
+  translateFormSubmission(testFormSubmissionId);
 }
 
 /**

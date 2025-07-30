@@ -1,29 +1,4 @@
 /**
- * Process a single document for translation
- */
-function processDocument(file) {
-  try {
-    const doc = DocumentApp.openById(file.getId());
-    const content = doc.getBody().getText();
-    
-    if (!content.trim()) {
-      console.log('Document is empty, skipping');
-      return;
-    }
-    
-    const translation = translateText(content, getTranslationPrompt());
-    
-    if (translation) {
-      createTranslatedDocument(file.getName(), translation);
-      console.log(`Successfully translated: ${file.getName()}`);
-    }
-    
-  } catch (error) {
-    console.error(`Error processing document ${file.getName()}:`, error);
-  }
-}
-
-/**
  * Get the translation prompt from the "Translate_Prompt" document
  */
 function getTranslationPrompt() {
@@ -55,6 +30,45 @@ function getTranslationPrompt() {
  */
 function getDefaultPrompt() {
   return `You are a professional translator. Please translate the following English text to ${CONFIG.TARGET_LANGUAGE}. Please provide only the translation, no explanations.`;
+}
+
+/**
+ * For a given form submission:
+ * -- extract form parameters & user responses
+ * -- construct the prompt based on user input
+ * -- run the translation
+ * */
+function translateFormSubmission(submissionId) {
+  const form = FormApp.openById(CONFIG.TRANSLATION_FORM_ID);
+  const itemResponses = form.getResponse(submissionId).getItemResponses();
+  let textToTranslate = ''
+  let requestName = ''
+
+  itemResponses.forEach(itemResponse => {
+    const response = itemResponse.getResponse()
+    switch (itemResponse.getItem().getTitle()) {
+      case CONFIG.TRANSLATED_TEXT_FORM_ITEM_NAME:
+        textToTranslate = response;
+        console.log(`Text To Translate: ${textToTranslate}`)
+        break;
+      case CONFIG.REQUEST_NAME_FORM_ITEM_NAME:
+        requestName = response;
+        console.log(`Request Name: ${requestName}`)
+        break;
+      default:
+        break;
+    }
+  });
+
+  try {
+    const translatedForm = translateText(textToTranslate, getTranslationPrompt())
+    if (translatedForm) {
+      createTranslatedDocument(requestName, translatedForm);
+      console.log(`Successfully translated ${requestName} for submission id ${submissionId}`)
+    }
+  } catch (error) {
+    console.error(`Error processing request ${requestName} for submission id ${submissionId}: `, error)
+  }
 }
 
 /**
