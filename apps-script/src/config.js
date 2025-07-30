@@ -7,15 +7,14 @@ const CONFIG = {
   TRANSLATION_FORM_ID: '',
   
   // Translation settings
-  OPENAI_MODEL: 'gpt-3.5-turbo',
+  OPENAI_MODEL: 'gpt-4o',
   MAX_TOKENS: 2000,
   TEMPERATURE: 0.3,
   
   // Processing settings
-  TRIGGER_INTERVAL_MINUTES: 5,
   PROCESSED_MARKER: 'TRANSLATED',
-  PROMPT_DOCUMENT_NAME: 'Translate_Prompt',
+  PROMPT_DOCUMENT_NAME: 'Arizona SNAP Translation Prompt — Modular Workflow Tool for Translators',
   FORM_TRIGGER_NAME: 'translateOnFormSubmission',
-  TRANSLATED_TEXT_FORM_ITEM_NAME: 'Text to be Translated',
-  REQUEST_NAME_FORM_ITEM_NAME: 'Request Name',
+  TRANSLATED_TEXT_FORM_ITEM_NAME: 'Please enter the text you want to translate',
+  REQUEST_NAME_FORM_ITEM_NAME: 'Translation Request Name',
 };
