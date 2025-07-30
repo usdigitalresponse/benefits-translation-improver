@@ -8,3 +8,6 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Scratchpad to keep the config values so we don't have to keep finding them
+config-personal.js

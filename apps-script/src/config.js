@@ -17,4 +17,6 @@ const CONFIG = {
   FORM_TRIGGER_NAME: 'translateOnFormSubmission',
   TRANSLATED_TEXT_FORM_ITEM_NAME: 'Please enter the text you want to translate',
   REQUEST_NAME_FORM_ITEM_NAME: 'Translation Request Name',
+  CONTENT_TYPE_FORM_ITEM_NAME: 'What is the type of content you want to translate?',
+  TAB_ID_REGEX: /\[TAB: ([^\]]+)]/
 };
