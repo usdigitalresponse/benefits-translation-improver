@@ -1,7 +1,12 @@
 /**
- * Get the translation prompt from the "Translate_Prompt" document
+ * Get the translation prompt from the master prompt document
+ * This will attempt to match the content type selected in the form to a tab
+ * with type-specific prompt text.
+ * If it can't access the tab, it will try to return the text in the document body.
+ * If it can't do that, it will return a default prompt string that's better than nothing :P
+ * @param {string} contentType - Content type with tab ID format: "Name [TAB: tabId]"
  */
-function getTranslationPrompt() {
+function getTranslationPrompt(contentType) {
   try {
     const contextFolder = DriveApp.getFolderById(CONFIG.CONTEXT_FOLDER_ID);
     const contextFiles = contextFolder.getFilesByType(MimeType.GOOGLE_DOCS);
@@ -10,9 +15,35 @@ function getTranslationPrompt() {
       const file = contextFiles.next();
       if (file.getName() === CONFIG.PROMPT_DOCUMENT_NAME) {
         const doc = DocumentApp.openById(file.getId());
-        const promptText = doc.getBody().getText();
-        console.log('Found custom translation prompt');
-        return promptText;
+        const docFallbackText = doc.getBody().getText();
+        
+        let tabId = null;
+        if (contentType) {
+          const tabMatch = contentType.match(CONFIG.TAB_ID_REGEX);
+          if (tabMatch) {
+            tabId = tabMatch[1];
+            console.log(`Extracted tab ID: ${tabId}`);
+          }
+        }
+        
+        if (!tabId) {
+          console.log('No tab ID specified, using main document body');
+          return docFallbackText;
+        }
+        
+        try {
+          const tab = doc.getTab(tabId);
+          if (!tab) {
+            console.log(`Tab ${tabId} not found, using main document body`);
+            return docFallbackText;
+          }
+          
+          console.log(`Found custom translation prompt from tab: ${tabId}`);
+          return tab.asDocumentTab().getBody().getText();
+        } catch (error) {
+          console.log(`Error accessing tab ${tabId}, using main document body:`, error);
+          return docFallbackText;
+        }
       }
     }
     
@@ -43,6 +74,7 @@ function translateFormSubmission(submissionId) {
   const itemResponses = form.getResponse(submissionId).getItemResponses();
   let textToTranslate = ''
   let requestName = ''
+  let contentType = ''
 
   itemResponses.forEach(itemResponse => {
     const response = itemResponse.getResponse()
@@ -55,13 +87,17 @@ function translateFormSubmission(submissionId) {
         requestName = response;
         console.log(`Request Name: ${requestName}`)
         break;
+      case CONFIG.CONTENT_TYPE_FORM_ITEM_NAME:
+        contentType = response;
+        console.log(`Content Type: ${contentType}`)
+        break;
       default:
         break;
     }
   });
 
   try {
-    const translatedForm = translateText(textToTranslate, getTranslationPrompt())
+    const translatedForm = translateText(textToTranslate, getTranslationPrompt(contentType))
     if (translatedForm) {
       createTranslatedDocument(requestName, translatedForm);
       console.log(`Successfully translated ${requestName} for submission id ${submissionId}`)
@@ -91,7 +127,7 @@ function translateText(content, customPrompt) {
         messages: [
           { role: 'user', content: fullPrompt }
         ],
-        max_tokens: CONFIG.MAX_TOKENS,
+        max_completion_tokens: CONFIG.MAX_TOKENS,
         temperature: CONFIG.TEMPERATURE
       })
     });
