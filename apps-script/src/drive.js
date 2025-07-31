@@ -1,5 +1,6 @@
 /**
  * Create a new document with the translated content
+ * @return {string} The URL of the created document, or null if creation failed
  */
 function createTranslatedDocument(originalName, translation) {
   try {
@@ -13,8 +14,11 @@ function createTranslatedDocument(originalName, translation) {
     newDocFile.moveTo(outputFolder);
     console.log(`Created translated document: ${translatedName}`);
     
+    return newDoc.getUrl();
+    
   } catch (error) {
     console.error('Error creating translated document:', error);
+    return null;
   }
 }
 

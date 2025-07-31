@@ -1,3 +1,6 @@
+// Word count regex - matches sequences of non-whitespace characters
+const WORD_COUNT_REGEX = /\s+/;
+
 /**
  * Get the translation prompt from the master prompt document
  * This will attempt to match the content type selected in the form to a tab
@@ -71,7 +74,10 @@ function getDefaultPrompt() {
  * */
 function translateFormSubmission(submissionId) {
   const form = FormApp.openById(CONFIG.TRANSLATION_FORM_ID);
-  const itemResponses = form.getResponse(submissionId).getItemResponses();
+  const formResponse = form.getResponse(submissionId);
+  const itemResponses = formResponse.getItemResponses();
+  const submissionTimestamp = formResponse.getTimestamp();
+  const respondentEmail = formResponse.getRespondentEmail();
   let textToTranslate = ''
   let requestName = ''
   let contentType = ''
@@ -97,10 +103,28 @@ function translateFormSubmission(submissionId) {
   });
 
   try {
-    const translatedForm = translateText(textToTranslate, getTranslationPrompt(contentType))
-    if (translatedForm) {
-      createTranslatedDocument(requestName, translatedForm);
+    // Latency tracking; a bit hacky but it works!
+    const startTime = new Date().getTime();
+    const translationResult = translateText(textToTranslate, getTranslationPrompt(contentType))
+    const endTime = new Date().getTime();
+    const translationDuration = endTime - startTime;
+    
+    if (translationResult && translationResult.translatedText) {
+      const documentUrl = createTranslatedDocument(requestName, translationResult.translatedText);
       console.log(`Successfully translated ${requestName} for submission id ${submissionId}`)
+      logTranslationInformation({
+        submissionTimestamp,
+        respondentEmail,
+        requestName,
+        contentType,
+        textToTranslate,
+        translatedText: translationResult.translatedText,
+        requestedWordCount: textToTranslate.trim().split(WORD_COUNT_REGEX).length,
+        translatedWordCount: translationResult.translatedText.trim().split(WORD_COUNT_REGEX).length,
+        translationDuration,
+        fullResponse: translationResult.fullResponse,
+        documentUrl
+      });
     }
   } catch (error) {
     console.error(`Error processing request ${requestName} for submission id ${submissionId}: `, error)
@@ -131,11 +155,14 @@ function translateText(content, customPrompt) {
         temperature: CONFIG.TEMPERATURE
       })
     });
-    
+
     const data = JSON.parse(response.getContentText());
     
     if (data.choices && data.choices[0]) {
-      return data.choices[0].message.content.trim();
+      return {
+        translatedText: data.choices[0].message.content.trim(),
+        fullResponse: data
+      };
     } else {
       console.error('Unexpected API response:', data);
       return null;
@@ -144,5 +171,37 @@ function translateText(content, customPrompt) {
   } catch (error) {
     console.error('Error calling OpenAI API:', error);
     return null;
+  }
+}
+
+function logTranslationInformation(requestAndResponseData) {
+  try {
+    const sheet = SpreadsheetApp.openById(CONFIG.RESPONSE_AGGREGATION_TRACKER_SHEET_ID).getActiveSheet();
+    
+    const rowData = CONFIG.TRACKING_SHEET_COLUMNS.map(column => {
+      // Check if this is a nested path (e.g., "fullResponse.usage.total_tokens")
+      if (column.dataKey.includes('.')) {
+        const keys = column.dataKey.split('.');
+        let value = requestAndResponseData;
+        
+        // Navigate through nested properties
+        for (const key of keys) {
+          value = value?.[key];
+          if (value === undefined) break;
+        }
+        
+        return value || '';
+      } else {
+        // Simple property access
+        return requestAndResponseData[column.dataKey] || '';
+      }
+    });
+    
+    sheet.appendRow(rowData);
+    
+    console.log('Successfully logged translation data to tracking sheet');
+  } catch (error) {
+    console.error('Error logging to tracking sheet:', error);
+    throw error;
   }
 }
