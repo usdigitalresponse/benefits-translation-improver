@@ -7,8 +7,10 @@ function checkConfiguration() {
   console.log('Configuration Status:');
   console.log('OUTPUT_FOLDER_ID:', CONFIG.OUTPUT_FOLDER_ID ? 'Set' : 'NOT SET');
   console.log('CONTEXT_FOLDER_ID:', CONFIG.CONTEXT_FOLDER_ID ? 'Set' : 'NOT SET');
+  console.log('ARCHIVE_FOLDER_ID:', CONFIG.ARCHIVE_FOLDER_ID ? 'Set' : 'NOT SET');
   console.log('OPENAI_API_KEY:', CONFIG.OPENAI_API_KEY !== 'KEY' ? 'Set' : 'NOT SET');
   console.log('TARGET_LANGUAGE:', CONFIG.TARGET_LANGUAGE);
+  console.log('DAYS_BEFORE_ARCHIVE:', CONFIG.DAYS_BEFORE_ARCHIVE);
 }
 
 /**
@@ -19,6 +21,7 @@ function validateConfiguration() {
   
   if (!CONFIG.OUTPUT_FOLDER_ID) missing.push('OUTPUT_FOLDER_ID');
   if (!CONFIG.CONTEXT_FOLDER_ID) missing.push('CONTEXT_FOLDER_ID');
+  if (!CONFIG.ARCHIVE_FOLDER_ID) missing.push('ARCHIVE_FOLDER_ID');
   if (CONFIG.OPENAI_API_KEY === 'KEY') missing.push('OPENAI_API_KEY');
   
   if (missing.length > 0) {
@@ -44,7 +47,15 @@ function getSystemStatus() {
   console.log('\n2. Triggers:');
   const triggers = ScriptApp.getProjectTriggers();
   const translationTriggers = triggers.filter(t => t.getHandlerFunction() === CONFIG.FORM_TRIGGER_NAME);
+  const archiveTriggers = triggers.filter(t => t.getHandlerFunction() === CONFIG.ARCHIVE_TRIGGER_FUNCTION_NAME);
   console.log(`Active translation triggers: ${translationTriggers.length}`);
+  console.log(`Active archive triggers: ${archiveTriggers.length}`);
+  
+  if (archiveTriggers.length > 0) {
+    archiveTriggers.forEach(trigger => {
+      console.log(`  - Archive trigger: ${trigger.getTriggerSource()} at hour ${trigger.getEventType() === ScriptApp.EventType.CLOCK ? 'time-based' : 'other'}`);
+    });
+  }
   
   // Check folders accessibility
   console.log('\n3. Folder Access:');
@@ -56,6 +67,10 @@ function getSystemStatus() {
     if (CONFIG.CONTEXT_FOLDER_ID) {
       const contextFolder = DriveApp.getFolderById(CONFIG.CONTEXT_FOLDER_ID);
       console.log(`Context folder: ${contextFolder.getName()} (accessible)`);
+    }
+    if (CONFIG.ARCHIVE_FOLDER_ID) {
+      const archiveFolder = DriveApp.getFolderById(CONFIG.ARCHIVE_FOLDER_ID);
+      console.log(`Archive folder: ${archiveFolder.getName()} (accessible)`);
     }
   } catch (error) {
     console.error('Error accessing folders:', error.message);
