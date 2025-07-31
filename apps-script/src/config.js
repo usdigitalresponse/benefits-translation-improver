@@ -2,6 +2,7 @@
 const CONFIG = {
   OUTPUT_FOLDER_ID: '',
   CONTEXT_FOLDER_ID: '',
+  ARCHIVE_FOLDER_ID: '',
   OPENAI_API_KEY: 'KEY', // Replace with your OpenAI API key
   TARGET_LANGUAGE: 'Spanish',
   TRANSLATION_FORM_ID: '',
@@ -18,5 +19,7 @@ const CONFIG = {
   TRANSLATED_TEXT_FORM_ITEM_NAME: 'Please enter the text you want to translate',
   REQUEST_NAME_FORM_ITEM_NAME: 'Translation Request Name',
   CONTENT_TYPE_FORM_ITEM_NAME: 'What is the type of content you want to translate?',
+  DAYS_BEFORE_ARCHIVE: 1,
+  ARCHIVE_TRIGGER_FUNCTION_NAME: 'archiveOldDocuments',
   TAB_ID_REGEX: /\[TAB: ([^\]]+)]/
 };
