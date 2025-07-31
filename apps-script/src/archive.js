@@ -78,13 +78,7 @@ function archiveOldDocuments() {
 function setupArchiveTriggers() {
   try {
     // Remove any existing archive triggers first
-    const triggers = ScriptApp.getProjectTriggers();
-    triggers.forEach(trigger => {
-      if (trigger.getHandlerFunction() === CONFIG.ARCHIVE_TRIGGER_FUNCTION_NAME) {
-        ScriptApp.deleteTrigger(trigger);
-        console.log('Removed existing archive trigger');
-      }
-    });
+    removeArchiveTriggers();
     
     // Create morning trigger (6 AM)
     ScriptApp.newTrigger(CONFIG.ARCHIVE_TRIGGER_FUNCTION_NAME)
@@ -112,4 +106,32 @@ function setupArchiveTriggers() {
  */
 function manualArchiveOldDocuments() {
   archiveOldDocuments();
+}
+
+/**
+ * Remove archive triggers
+ * Useful for disabling automatic archiving
+ */
+function removeArchiveTriggers() {
+  try {
+    const triggers = ScriptApp.getProjectTriggers();
+    let removedCount = 0;
+    
+    triggers.forEach(trigger => {
+      if (trigger.getHandlerFunction() === CONFIG.ARCHIVE_TRIGGER_FUNCTION_NAME) {
+        ScriptApp.deleteTrigger(trigger);
+        removedCount++;
+        console.log(`Removed archive trigger scheduled at hour ${trigger.getHour ? trigger.getHour() : 'N/A'}`);
+      }
+    });
+    
+    if (removedCount > 0) {
+      console.log(`Successfully removed ${removedCount} archive trigger(s)`);
+    } else {
+      console.log('No archive triggers found to remove');
+    }
+    
+  } catch (error) {
+    console.error('Error removing archive triggers:', error);
+  }
 }

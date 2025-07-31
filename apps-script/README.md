@@ -1,6 +1,6 @@
 # Apps Script Translation App
 
-A Google Apps Script for translation functionality, leveraging Google Drive folders.
+A Google Apps Script for form-based translation with automatic archiving, leveraging Google Drive folders and OpenAI API.
 
 ## Setup
 
@@ -41,31 +41,76 @@ user-managed Google Cloud Platform project. For simplicity's sake, we are not pl
 
 ## File Structure
 
-- `src/main.js` - Entry points, trigger setups and utility methods
+- `src/main.js` - Entry points and form trigger setup
 - `src/config.js` - Configuration constants and settings
 - `src/drive.js` - Google Drive operations and file management
-- `src/translation.js` - Core translation logic and LLM API calls
+- `src/translation.js` - Core translation logic and OpenAI API calls
+- `src/archive.js` - Document archiving functionality
 - `src/utils.js` - System status, validation, etc.
 - `src/appsscript.json` - Apps Script configuration
 - `.clasp.json` - Clasp configuration (auto-generated)
 
-## Testing
+## Setup & Configuration
 
 Run and test functions directly in the Apps Script editor at script.google.com for the best debugging experience.
 
-After creating the project and pushing to your Google workspace:
-1. Load the script
-2. In config.js, add in your API key(s)
-3. Create a parent folder for the TranslationApp files. Within that folder, create three sub-folders: Docs_to_Translate, Translated_Docs and Translation_Content. Copy each of these IDs into the relevant property in config.js
-5. If you've already created the folders and need the IDs, you can run the `getFolderIds` method in `drive.js` to find your folder IDs and copy them over.
-6. Add the custom prompt to the Translation_Context folder, named Translate_Prompt
-7. Run the `setupTrigger` method in `main.js` to add the trigger to listen for new files
-8. Add a new file to be translated in Docs_To_Translate
-9. Wait up to 2 minutes and see the translation in Translated_Docs
-10. Run the utility method `removeTrigger` in `main.js` to remove the trigger (optional, but just in case you don't want it listening forever)
+### Initial Setup:
+1. Load the script in Apps Script editor
+2. **Set timezone**: Go to Project Settings → adjust project timezone (recommended: "America/Phoenix" for Arizona)
+3. In `config.js`, configure:
+   - `OPENAI_API_KEY`: Your OpenAI API key
+   - `OUTPUT_FOLDER_ID`: Where translated documents will be created
+   - `CONTEXT_FOLDER_ID`: Where your prompt document lives
+   - `ARCHIVE_FOLDER_ID`: Where old translations are moved
+   - `TRANSLATION_FORM_ID`: Your Google Form ID
+   - `DAYS_BEFORE_ARCHIVE`: How many days before archiving old documents (default: 1)
 
-## System Status Markers
-You have various utility methods available in `utils.js` to verify the status of the system:
-- `validateConfiguration` - checks if all the necessary config properties are set for the script to run successfully
-- `getSystemStatus` - checks configuration, triggers and folders
-- `resetProcessedMarkers` - in case you want to mark the files in the source folder as "unprocessed" to translate again
+### Create Required Components:
+1. **Google Form** with these fields (exact names matter):
+   - "Please enter the text you want to translate" (paragraph text)
+   - "Translation Request Name" (short text)
+   - "What is the type of content you want to translate?" (dropdown with options like "Public outreach flyer [TAB: t.1yn59ynq1uqa]")
+
+2. **Prompt Document** in your context folder:
+   - Create a Google Doc named "Arizona SNAP Translation Prompt — Modular Workflow Tool for Translators"
+   - Add different tabs for different content types
+   - Each tab's ID should match the TAB IDs in your form dropdown
+
+3. **Folder Structure**:
+   - Output folder: Where translations are saved
+   - Context folder: Contains prompt document, lexicon, etc.
+   - Archive folder: Where old translations are moved
+
+### Set Up Triggers:
+1. Run `setupFormTrigger()` to enable form submission handling
+2. Run `setupArchiveTriggers()` to enable automatic archiving (runs at 6 AM and 6 PM daily)
+
+## Testing the System
+
+1. Submit a test form with sample text
+2. Check the output folder for the translated document
+3. Run `getSystemStatus()` to verify all components are working
+4. Run `manualArchiveOldDocuments()` to test archiving
+
+## Archive System
+
+Documents are automatically archived after `DAYS_BEFORE_ARCHIVE` days:
+- Runs twice daily (6 AM and 6 PM) in script timezone
+- Example with 1-day setting:
+  - Doc created Monday 9 AM → archived Tuesday 6 PM (33 hours)
+  - Doc created Monday 7 PM → archived Wednesday 6 AM (35 hours)
+- Maximum time before archive: ~37 hours
+
+## Utility Functions
+
+### System Status (`utils.js`):
+- `validateConfiguration()` - Checks if all required config properties are set
+- `getSystemStatus()` - Comprehensive check of configuration, triggers, and folder access
+- `checkConfiguration()` - Displays current configuration values
+
+### Manual Operations:
+- `manualArchiveOldDocuments()` - Manually run the archive process
+- `removeFormTrigger()` - Remove form submission trigger
+- `setupFormTrigger()` - Re-establish form trigger
+- `setupArchiveTriggers()` - Set up or reset archive triggers
+- `removeArchiveTriggers()` - Remove archive triggers to disable automatic archiving
