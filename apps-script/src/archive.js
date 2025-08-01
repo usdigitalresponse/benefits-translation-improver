@@ -50,8 +50,8 @@ function archiveOldDocuments() {
       if (createdDate < archiveThreshold) {
         try {
           // Move file to archive folder
-          archiveFolder.addFile(file);
-          outputFolder.removeFile(file);
+          // Use moveTo() for shared drive compatibility
+          file.moveTo(archiveFolder);
           
           console.log(`Archived: ${file.getName()} (created: ${createdDate.toISOString()})`);
           archivedCount++;
