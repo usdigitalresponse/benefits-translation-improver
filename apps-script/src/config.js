@@ -10,8 +10,8 @@ const CONFIG = {
   
   // Translation settings
   OPENAI_MODEL: 'gpt-4o',
-  MAX_TOKENS: 2000,
-  TEMPERATURE: 0.3,
+  MAX_TOKENS: 4000,
+  TEMPERATURE: 0,
   
   // Processing settings
   PROCESSED_MARKER: 'TRANSLATED',
