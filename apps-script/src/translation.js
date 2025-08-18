@@ -140,10 +140,15 @@ function translateText(content, customPrompt) {
         Text to translate:
         ${content}`;
 
+    const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY not found in script properties');
+    }
+
     const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${CONFIG.OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       payload: JSON.stringify({

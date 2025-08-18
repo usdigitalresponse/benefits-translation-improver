@@ -8,7 +8,7 @@ function checkConfiguration() {
   console.log('OUTPUT_FOLDER_ID:', CONFIG.OUTPUT_FOLDER_ID ? 'Set' : 'NOT SET');
   console.log('CONTEXT_FOLDER_ID:', CONFIG.CONTEXT_FOLDER_ID ? 'Set' : 'NOT SET');
   console.log('ARCHIVE_FOLDER_ID:', CONFIG.ARCHIVE_FOLDER_ID ? 'Set' : 'NOT SET');
-  console.log('OPENAI_API_KEY:', CONFIG.OPENAI_API_KEY !== 'KEY' ? 'Set' : 'NOT SET');
+  console.log('TRANSLATION FORM ID: ', CONFIG.TRANSLATION_FORM_ID ? 'Set': 'NOT SET')
   console.log('TARGET_LANGUAGE:', CONFIG.TARGET_LANGUAGE);
   console.log('DAYS_BEFORE_ARCHIVE:', CONFIG.DAYS_BEFORE_ARCHIVE);
 }
@@ -22,8 +22,8 @@ function validateConfiguration() {
   if (!CONFIG.OUTPUT_FOLDER_ID) missing.push('OUTPUT_FOLDER_ID');
   if (!CONFIG.CONTEXT_FOLDER_ID) missing.push('CONTEXT_FOLDER_ID');
   if (!CONFIG.ARCHIVE_FOLDER_ID) missing.push('ARCHIVE_FOLDER_ID');
-  if (CONFIG.OPENAI_API_KEY === 'KEY') missing.push('OPENAI_API_KEY');
-  
+  if (!CONFIG.TRANSLATION_FORM_ID) missing.push('TRANSLATION_FORM_ID');
+
   if (missing.length > 0) {
     console.error('Missing configuration:', missing.join(', '));
     return false;
@@ -74,6 +74,19 @@ function getSystemStatus() {
     }
   } catch (error) {
     console.error('Error accessing folders:', error.message);
+  }
+
+  // Check Properties Service
+  console.log('\n4. Properties Service / API key(s)');
+  try {
+    const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+      if (!apiKey) {
+        console.log('API key not set');
+      } else {
+        console.log('API key set');
+      }
+  } catch (error) {
+    console.error('Error retrieving API key:', error.message);
   }
   
   console.log('\n=== End Status ===');
