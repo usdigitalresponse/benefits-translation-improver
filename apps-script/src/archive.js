@@ -22,8 +22,12 @@ function archiveOldDocuments() {
   try {
     console.log('Starting archive process...');
     
-    const outputFolder = DriveApp.getFolderById(CONFIG.OUTPUT_FOLDER_ID);
-    const archiveFolder = DriveApp.getFolderById(CONFIG.ARCHIVE_FOLDER_ID);
+    const outputFolder = DriveApp.getFolderById(
+        PropertiesService.getScriptProperties().getProperty("OUTPUT_FOLDER_ID")
+    );
+    const archiveFolder = DriveApp.getFolderById(
+        PropertiesService.getScriptProperties().getProperty("ARCHIVE_FOLDER_ID")
+    );
     const files = outputFolder.getFiles();
     
     const now = new Date();

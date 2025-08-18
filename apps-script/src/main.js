@@ -3,12 +3,12 @@
  * Run this function once to install the trigger.
  */
 function setupFormTrigger() {
-  if (!CONFIG.TRANSLATION_FORM_ID) {
-    console.error('TRANSLATION_FORM_ID is not set in config.js');
+  if (!PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID")) {
+    console.error('TRANSLATION_FORM_ID is not set in script properties');
     return;
   }
   
-  const form = FormApp.openById(CONFIG.TRANSLATION_FORM_ID)
+  const form = FormApp.openById(PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID"))
   ScriptApp.newTrigger(CONFIG.FORM_TRIGGER_NAME)
       .forForm(form)
       .onFormSubmit()
@@ -23,8 +23,8 @@ function translateOnFormSubmission(e) {
   try {
     // Check if the form submission is from the correct form
     const formId = e.source.getId();
-    if (formId !== CONFIG.TRANSLATION_FORM_ID) {
-      console.log(`Form submission from unexpected form ID: ${formId}. Expected: ${CONFIG.TRANSLATION_FORM_ID}`);
+    if (formId !== PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID")) {
+      console.log(`Form submission from unexpected form ID: ${formId}. Expected: ${PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID")}`);
       return;
     }
 

@@ -57,13 +57,13 @@ Run and test functions directly in the Apps Script editor at script.google.com f
 ### Initial Setup:
 1. Load the script in Apps Script editor
 2. **Set timezone**: Go to Project Settings → adjust project timezone (recommended: "America/Phoenix" for Arizona)
-3. In `config.js`, configure:
+3. **Set properties referenced in the script**: Go to Project Settings -> Script properties -> Edit / add script properties
    - `OPENAI_API_KEY`: Your OpenAI API key
    - `OUTPUT_FOLDER_ID`: Where translated documents will be created
    - `CONTEXT_FOLDER_ID`: Where your prompt document lives
    - `ARCHIVE_FOLDER_ID`: Where old translations are moved
    - `TRANSLATION_FORM_ID`: Your Google Form ID
-   - `DAYS_BEFORE_ARCHIVE`: How many days before archiving old documents (default: 1)
+   - `RESPONSE_AGGREGATION_TRACKER_SHEET_ID`: The ID for the Google Sheet where response metadata will be collected
 
 ### Create Required Components:
 1. **Google Form** with these fields (exact names matter):

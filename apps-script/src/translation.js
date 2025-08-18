@@ -11,7 +11,7 @@ const WORD_COUNT_REGEX = /\s+/;
  */
 function getTranslationPrompt(contentType) {
   try {
-    const contextFolder = DriveApp.getFolderById(CONFIG.CONTEXT_FOLDER_ID);
+    const contextFolder = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("CONTEXT_FOLDER_ID"));
     const contextFiles = contextFolder.getFilesByType(MimeType.GOOGLE_DOCS);
     
     while (contextFiles.hasNext()) {
@@ -73,7 +73,7 @@ function getDefaultPrompt() {
  * -- run the translation
  * */
 function translateFormSubmission(submissionId) {
-  const form = FormApp.openById(CONFIG.TRANSLATION_FORM_ID);
+  const form = FormApp.openById(PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID"));
   const formResponse = form.getResponse(submissionId);
   const itemResponses = formResponse.getItemResponses();
   const submissionTimestamp = formResponse.getTimestamp();
@@ -181,7 +181,9 @@ function translateText(content, customPrompt) {
 
 function logTranslationInformation(requestAndResponseData) {
   try {
-    const sheet = SpreadsheetApp.openById(CONFIG.RESPONSE_AGGREGATION_TRACKER_SHEET_ID).getActiveSheet();
+    const sheet = SpreadsheetApp.openById(
+        PropertiesService.getScriptProperties().getProperty("RESPONSE_AGGREGATION_TRACKER_SHEET_ID")
+    ).getActiveSheet();
     
     const rowData = CONFIG.TRACKING_SHEET_COLUMNS.map(column => {
       // Check if this is a nested path (e.g., "fullResponse.usage.total_tokens")
