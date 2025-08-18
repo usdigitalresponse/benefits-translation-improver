@@ -4,7 +4,9 @@
  */
 function createTranslatedDocument(originalName, translation) {
   try {
-    const outputFolder = DriveApp.getFolderById(CONFIG.OUTPUT_FOLDER_ID);
+    const outputFolder = DriveApp.getFolderById(
+        PropertiesService.getScriptProperties().getProperty("OUTPUT_FOLDER_ID")
+    );
     const translatedName = `${originalName} - Translated to ${CONFIG.TARGET_LANGUAGE}`;
     
     const newDoc = DocumentApp.create(translatedName);
@@ -69,8 +71,4 @@ function getFolderIds() {
     }
     console.log('');
   });
-  
-  console.log('Copy the IDs above into your config.js file:');
-  console.log('- OUTPUT_FOLDER_ID: Use the ID for "Translated_Docs"');
-  console.log('- CONTEXT_FOLDER_ID: Use the ID for "Translation_Context"');
 }

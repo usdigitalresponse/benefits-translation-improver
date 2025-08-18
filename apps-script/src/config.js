@@ -1,12 +1,7 @@
 // Configuration constants
 const CONFIG = {
-  OUTPUT_FOLDER_ID: '',
-  CONTEXT_FOLDER_ID: '',
-  ARCHIVE_FOLDER_ID: '',
   TARGET_LANGUAGE: 'Spanish',
-  TRANSLATION_FORM_ID: '',
-  RESPONSE_AGGREGATION_TRACKER_SHEET_ID: '',
-  
+
   // Translation settings
   OPENAI_MODEL: 'gpt-4o',
   MAX_TOKENS: 4000,

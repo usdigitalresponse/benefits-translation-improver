@@ -5,10 +5,10 @@
  */
 function checkConfiguration() {
   console.log('Configuration Status:');
-  console.log('OUTPUT_FOLDER_ID:', CONFIG.OUTPUT_FOLDER_ID ? 'Set' : 'NOT SET');
-  console.log('CONTEXT_FOLDER_ID:', CONFIG.CONTEXT_FOLDER_ID ? 'Set' : 'NOT SET');
-  console.log('ARCHIVE_FOLDER_ID:', CONFIG.ARCHIVE_FOLDER_ID ? 'Set' : 'NOT SET');
-  console.log('TRANSLATION FORM ID: ', CONFIG.TRANSLATION_FORM_ID ? 'Set': 'NOT SET')
+  console.log('OUTPUT_FOLDER_ID:', PropertiesService.getScriptProperties().getProperty("OUTPUT_FOLDER_ID") ? 'Set' : 'NOT SET');
+  console.log('CONTEXT_FOLDER_ID:', PropertiesService.getScriptProperties().getProperty("CONTEXT_FOLDER_ID") ? 'Set' : 'NOT SET');
+  console.log('ARCHIVE_FOLDER_ID:', PropertiesService.getScriptProperties().getProperty("ARCHIVE_FOLDER_ID") ? 'Set' : 'NOT SET');
+  console.log('TRANSLATION FORM ID: ', PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID") ? 'Set': 'NOT SET')
   console.log('TARGET_LANGUAGE:', CONFIG.TARGET_LANGUAGE);
   console.log('DAYS_BEFORE_ARCHIVE:', CONFIG.DAYS_BEFORE_ARCHIVE);
 }
@@ -19,10 +19,10 @@ function checkConfiguration() {
 function validateConfiguration() {
   const missing = [];
   
-  if (!CONFIG.OUTPUT_FOLDER_ID) missing.push('OUTPUT_FOLDER_ID');
-  if (!CONFIG.CONTEXT_FOLDER_ID) missing.push('CONTEXT_FOLDER_ID');
-  if (!CONFIG.ARCHIVE_FOLDER_ID) missing.push('ARCHIVE_FOLDER_ID');
-  if (!CONFIG.TRANSLATION_FORM_ID) missing.push('TRANSLATION_FORM_ID');
+  if (!PropertiesService.getScriptProperties().getProperty("OUTPUT_FOLDER_ID")) missing.push('OUTPUT_FOLDER_ID');
+  if (!PropertiesService.getScriptProperties().getProperty("CONTEXT_FOLDER_ID")) missing.push('CONTEXT_FOLDER_ID');
+  if (!PropertiesService.getScriptProperties().getProperty("ARCHIVE_FOLDER_ID")) missing.push('ARCHIVE_FOLDER_ID');
+  if (!PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID")) missing.push('TRANSLATION_FORM_ID');
 
   if (missing.length > 0) {
     console.error('Missing configuration:', missing.join(', '));
@@ -60,16 +60,16 @@ function getSystemStatus() {
   // Check folders accessibility
   console.log('\n3. Folder Access:');
   try {
-    if (CONFIG.OUTPUT_FOLDER_ID) {
-      const outputFolder = DriveApp.getFolderById(CONFIG.OUTPUT_FOLDER_ID);
+    if (PropertiesService.getScriptProperties().getProperty("OUTPUT_FOLDER_ID")) {
+      const outputFolder = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("OUTPUT_FOLDER_ID"));
       console.log(`Output folder: ${outputFolder.getName()} (accessible)`);
     }
-    if (CONFIG.CONTEXT_FOLDER_ID) {
-      const contextFolder = DriveApp.getFolderById(CONFIG.CONTEXT_FOLDER_ID);
+    if (PropertiesService.getScriptProperties().getProperty("CONTEXT_FOLDER_ID")) {
+      const contextFolder = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("CONTEXT_FOLDER_ID"));
       console.log(`Context folder: ${contextFolder.getName()} (accessible)`);
     }
-    if (CONFIG.ARCHIVE_FOLDER_ID) {
-      const archiveFolder = DriveApp.getFolderById(CONFIG.ARCHIVE_FOLDER_ID);
+    if (PropertiesService.getScriptProperties().getProperty("ARCHIVE_FOLDER_ID")) {
+      const archiveFolder = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("ARCHIVE_FOLDER_ID"));
       console.log(`Archive folder: ${archiveFolder.getName()} (accessible)`);
     }
   } catch (error) {
