@@ -84,7 +84,6 @@ function translateFormSubmission(submissionId) {
 
   itemResponses.forEach(itemResponse => {
     const response = itemResponse.getResponse()
-    console.log(itemResponse)
     switch (itemResponse.getItem().getTitle()) {
       case CONFIG.TRANSLATED_TEXT_FORM_ITEM_NAME:
         textToTranslate = response;
