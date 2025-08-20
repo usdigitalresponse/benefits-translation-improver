@@ -105,12 +105,18 @@ function translateFormSubmission(submissionId) {
   try {
     // Latency tracking; a bit hacky but it works!
     const startTime = new Date().getTime();
-    const translationResult = translateText(textToTranslate, getTranslationPrompt(contentType))
+    const prompt = getTranslationPrompt(contentType)
+    const translationResult = translateText(textToTranslate, prompt)
     const endTime = new Date().getTime();
     const translationDuration = endTime - startTime;
     
     if (translationResult && translationResult.translatedText) {
-      const documentUrl = createTranslatedDocument(requestName, translationResult.translatedText);
+      const documentUrl = createTemplatedTranslationDocument(
+          requestName,
+          translationResult.translatedText,
+          textToTranslate,
+          prompt
+      )
       console.log(`Successfully translated ${requestName} for submission id ${submissionId}`)
       logTranslationInformation({
         submissionTimestamp,
