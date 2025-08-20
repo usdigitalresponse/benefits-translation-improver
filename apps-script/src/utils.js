@@ -9,6 +9,7 @@ function checkConfiguration() {
   console.log('CONTEXT_FOLDER_ID:', PropertiesService.getScriptProperties().getProperty("CONTEXT_FOLDER_ID") ? 'Set' : 'NOT SET');
   console.log('ARCHIVE_FOLDER_ID:', PropertiesService.getScriptProperties().getProperty("ARCHIVE_FOLDER_ID") ? 'Set' : 'NOT SET');
   console.log('TRANSLATION FORM ID: ', PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID") ? 'Set': 'NOT SET')
+  console.log('GLOSSARY_SHEET_ID:', PropertiesService.getScriptProperties().getProperty("GLOSSARY_SHEET_ID") ? 'Set' : 'NOT SET (Optional)');
   console.log('TARGET_LANGUAGE:', CONFIG.TARGET_LANGUAGE);
   console.log('DAYS_BEFORE_ARCHIVE:', CONFIG.DAYS_BEFORE_ARCHIVE);
 }
@@ -30,6 +31,15 @@ function validateConfiguration() {
   }
   
   console.log('Configuration is valid');
+  
+  // Check optional configurations
+  const glossaryConfigured = PropertiesService.getScriptProperties().getProperty("GLOSSARY_SHEET_ID");
+  if (glossaryConfigured) {
+    console.log('Optional: Glossary sheet is configured');
+  } else {
+    console.log('Optional: Glossary sheet not configured (translations will proceed without glossary)');
+  }
+  
   return true;
 }
 
@@ -87,6 +97,28 @@ function getSystemStatus() {
       }
   } catch (error) {
     console.error('Error retrieving API key:', error.message);
+  }
+
+  // Check Glossary Sheet
+  console.log('\n5. Glossary Sheet (Optional):');
+  try {
+    const glossarySheetId = PropertiesService.getScriptProperties().getProperty('GLOSSARY_SHEET_ID');
+    if (!glossarySheetId) {
+      console.log('No glossary sheet configured (optional feature)');
+    } else {
+      const spreadsheet = SpreadsheetApp.openById(glossarySheetId);
+      const sheet = spreadsheet.getSheetByName('Curated List');
+      if (sheet) {
+        const dataRange = sheet.getDataRange();
+        const numRows = dataRange.getNumRows() - 1;
+        console.log(`Glossary sheet accessible: ${spreadsheet.getName()}`);
+        console.log(`  - "Curated List" tab found with ${numRows} term pairs (excluding header)`);
+      } else {
+        console.log(`Glossary sheet accessible but "Curated List" tab not found`);
+      }
+    }
+  } catch (error) {
+    console.error('Error accessing glossary sheet:', error.message);
   }
   
   console.log('\n=== End Status ===');

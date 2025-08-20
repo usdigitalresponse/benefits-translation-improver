@@ -62,6 +62,7 @@ Run and test functions directly in the Apps Script editor at script.google.com f
    - `OUTPUT_FOLDER_ID`: Where translated documents will be created
    - `CONTEXT_FOLDER_ID`: Where your prompt document lives
    - `ARCHIVE_FOLDER_ID`: Where old translations are moved
+   - `GLOSSARY_SHEET_ID`: Spreadsheet ID for a glossary or lexicon (script treats as optional)
    - `TRANSLATION_FORM_ID`: Your Google Form ID
    - `RESPONSE_AGGREGATION_TRACKER_SHEET_ID`: The ID for the Google Sheet where response metadata will be collected
 

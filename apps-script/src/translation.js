@@ -138,13 +138,83 @@ function translateFormSubmission(submissionId) {
 }
 
 /**
+ * Fetch glossary terms from Google Sheets
+ * @returns {string} Formatted glossary string for prompt inclusion, or empty string if unavailable
+ * Glossary strings formatted like the below example:
+ *   benefit → beneficio
+ */
+function getGlossaryFromSheet() {
+  try {
+    const glossarySheetId = PropertiesService.getScriptProperties().getProperty('GLOSSARY_SHEET_ID');
+    if (!glossarySheetId) {
+      console.log('No GLOSSARY_SHEET_ID configured in script properties');
+      return '';
+    }
+
+    const spreadsheet = SpreadsheetApp.openById(glossarySheetId);
+    const sheet = spreadsheet.getSheetByName('Curated List');
+    
+    if (!sheet) {
+      console.log('Sheet "Curated List" not found in glossary spreadsheet');
+      return '';
+    }
+
+    const data = sheet.getDataRange().getValues();
+    
+    if (data.length <= 1) {
+      console.log('No glossary data found (only header row or empty)');
+      return '';
+    }
+    
+    // Build glossary string, skipping header row
+    // Column A: Original English term, Column B: Translated term
+    const glossaryPairs = [];
+    for (let i = 1; i < data.length; i++) {
+      const englishTerm = data[i][0]?.toString().trim();
+      const translatedTerm = data[i][1]?.toString().trim();
+      
+      if (englishTerm && translatedTerm) {
+        glossaryPairs.push(`${englishTerm} → ${translatedTerm}`);
+      }
+    }
+    
+    if (glossaryPairs.length === 0) {
+      console.log('No valid glossary pairs found');
+      return '';
+    }
+    
+    console.log(`Loaded ${glossaryPairs.length} glossary terms`);
+    return glossaryPairs.join('\n');
+    
+  } catch (error) {
+    console.error('Error fetching glossary from sheet:', error);
+    return '';
+  }
+}
+
+/**
  * Translate text using OpenAI API with custom prompt
  */
 function translateText(content, customPrompt) {
   try {
-    const fullPrompt = `${customPrompt}
+    // Get glossary terms if available
+    const glossaryTerms = getGlossaryFromSheet();
+    
+    // Build the full prompt with lexicon if available
+    let fullPrompt = customPrompt;
+    if (glossaryTerms) {
+      fullPrompt = `${customPrompt}
+        
+        Please use this lexicon for consistent terminology:
+        ${glossaryTerms}
+        
         Text to translate:
         ${content}`;
+    } else {
+      fullPrompt = `${customPrompt}
+        Text to translate:
+        ${content}`;
+    }
 
     const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
     if (!apiKey) {
