@@ -152,7 +152,7 @@ function getGlossaryFromSheet() {
     }
 
     const spreadsheet = SpreadsheetApp.openById(glossarySheetId);
-    const sheet = spreadsheet.getSheetByName('Curated List');
+    const sheet = spreadsheet.getSheetByName(CONFIG.LEXICON_SHEET_NAME);
     
     if (!sheet) {
       console.log('Sheet "Curated List" not found in glossary spreadsheet');
