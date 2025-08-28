@@ -3,16 +3,17 @@ const CONFIG = {
   TARGET_LANGUAGE: 'Spanish',
 
   // Translation settings
-  OPENAI_MODEL: 'gpt-4o',
+  OPENAI_MODEL: 'gpt-4.1',
   MAX_TOKENS: 4000,
   TEMPERATURE: 0,
   
   // Processing settings
   PROCESSED_MARKER: 'TRANSLATED',
   PROMPT_DOCUMENT_NAME: 'Arizona SNAP Translation Prompt — Modular Workflow Tool for Translators',
+  LEXICON_SHEET_NAME: 'Curated List',
   FORM_TRIGGER_NAME: 'translateOnFormSubmission',
-  TRANSLATED_TEXT_FORM_ITEM_NAME: 'Please enter the text you want to translate',
-  REQUEST_NAME_FORM_ITEM_NAME: 'Translation Request Name',
+  TRANSLATED_TEXT_FORM_ITEM_NAME: 'Please enter the text you want to translate or evaluate (max. 3000 words)',
+  REQUEST_NAME_FORM_ITEM_NAME: 'Please enter a descriptive file name you will remember to locate your translation/evaluation.',
   CONTENT_TYPE_FORM_ITEM_NAME: 'What is the type of content you want to translate?',
   DAYS_BEFORE_ARCHIVE: 1,
   ARCHIVE_TRIGGER_FUNCTION_NAME: 'archiveOldDocuments',
