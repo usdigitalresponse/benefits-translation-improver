@@ -193,7 +193,7 @@ function getGlossaryFromSheet() {
 }
 
 /**
- * Translate text using OpenAI API with custom prompt
+ * Translate text using Azure API with custom prompt
  */
 function translateText(content, customPrompt) {
   try {
@@ -216,25 +216,32 @@ function translateText(content, customPrompt) {
         ${content}`;
     }
 
-    const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+    const apiKey = PropertiesService.getScriptProperties().getProperty('AZURE_API_KEY');
+    // TODO format to take the version number and then put that in the document rather than OpenAI model
+    const azureUrl = PropertiesService.getScriptProperties().getProperty('AZURE_API_URL')
     if (!apiKey) {
-      throw new Error('OPENAI_API_KEY not found in script properties');
+      throw new Error('AZURE_API_KEY not found in script properties');
     }
 
-    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      payload: JSON.stringify({
-        model: CONFIG.OPENAI_MODEL,
-        messages: [
-          { role: 'user', content: fullPrompt }
-        ],
-        max_completion_tokens: CONFIG.MAX_TOKENS,
-        temperature: CONFIG.TEMPERATURE
-      })
+    if (!azureUrl) {
+      throw new Error('AZURE_API_URL not found in script properties')
+    }
+
+    const response = UrlFetchApp.fetch(
+        azureUrl,
+        {
+          method: 'POST',
+          headers: {
+            'api-key': apiKey,
+            'Content-Type': 'application/json'
+          },
+          payload: JSON.stringify({
+            messages: [
+              { role: 'user', content: fullPrompt }
+            ],
+            max_tokens: CONFIG.MAX_TOKENS,
+            temperature: CONFIG.TEMPERATURE
+          })
     });
 
     const data = JSON.parse(response.getContentText());
