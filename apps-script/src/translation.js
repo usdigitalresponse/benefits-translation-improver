@@ -106,7 +106,7 @@ function translateFormSubmission(submissionId) {
     // Latency tracking; a bit hacky but it works!
     const startTime = new Date().getTime();
     const prompt = getTranslationPrompt(contentType)
-    const translationResult = translateText(textToTranslate, prompt)
+    const translationResult = translateTextWithAzure(textToTranslate, prompt)
     const endTime = new Date().getTime();
     const translationDuration = endTime - startTime;
     
@@ -115,7 +115,11 @@ function translateFormSubmission(submissionId) {
           requestName,
           translationResult.translatedText,
           textToTranslate,
-          prompt
+          prompt,
+          // With Azure, the model is associated with the deployment of whatever resource you created, not specified
+          // at request time. In order to ascertain the model associated with whatever deployment is being used,
+          // we'll log what comes back with the translation response
+          translationResult.fullResponse.model
       )
       console.log(`Successfully translated ${requestName} for submission id ${submissionId}`)
       logTranslationInformation({
@@ -193,9 +197,9 @@ function getGlossaryFromSheet() {
 }
 
 /**
- * Translate text using OpenAI API with custom prompt
+ * Translate text using Azure API with custom prompt
  */
-function translateText(content, customPrompt) {
+function translateTextWithAzure(content, customPrompt) {
   try {
     // Get glossary terms if available
     const glossaryTerms = getGlossaryFromSheet();
@@ -216,25 +220,41 @@ function translateText(content, customPrompt) {
         ${content}`;
     }
 
-    const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+    const apiKey = PropertiesService.getScriptProperties().getProperty('AZURE_API_KEY');
+    const deploymentName = PropertiesService.getScriptProperties().getProperty('AZURE_DEPLOYMENT_NAME');
+    const resourceName = PropertiesService.getScriptProperties().getProperty('AZURE_RESOURCE_NAME');
+    const azureApiVersion = PropertiesService.getScriptProperties().getProperty('AZURE_API_VERSION');
+
     if (!apiKey) {
-      throw new Error('OPENAI_API_KEY not found in script properties');
+      throw new Error('AZURE_API_KEY not found in script properties');
+    }
+    if (!deploymentName) {
+      throw new Error('AZURE_DEPLOYMENT_NAME not found in script properties');
+    }
+    if (!resourceName) {
+      throw new Error('AZURE_RESOURCE_NAME not found in script properties');
+    }
+    if (!azureApiVersion) {
+      throw new Error('AZURE_API_VERSION not found in script properties');
     }
 
-    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      payload: JSON.stringify({
-        model: CONFIG.OPENAI_MODEL,
-        messages: [
-          { role: 'user', content: fullPrompt }
-        ],
-        max_completion_tokens: CONFIG.MAX_TOKENS,
-        temperature: CONFIG.TEMPERATURE
-      })
+    const azureEndpoint = `https://${resourceName}.openai.azure.com/openai/deployments/${deploymentName}/chat/completions?api-version=${azureApiVersion}`;
+
+    const response = UrlFetchApp.fetch(
+        azureEndpoint,
+        {
+          method: 'POST',
+          headers: {
+            'api-key': apiKey,
+            'Content-Type': 'application/json'
+          },
+          payload: JSON.stringify({
+            messages: [
+              { role: 'user', content: fullPrompt }
+            ],
+            max_tokens: CONFIG.MAX_TOKENS,
+            temperature: CONFIG.TEMPERATURE
+          })
     });
 
     const data = JSON.parse(response.getContentText());

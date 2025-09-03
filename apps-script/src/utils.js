@@ -10,6 +10,10 @@ function checkConfiguration() {
   console.log('ARCHIVE_FOLDER_ID:', PropertiesService.getScriptProperties().getProperty("ARCHIVE_FOLDER_ID") ? 'Set' : 'NOT SET');
   console.log('TRANSLATION FORM ID: ', PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID") ? 'Set': 'NOT SET')
   console.log('GLOSSARY_SHEET_ID:', PropertiesService.getScriptProperties().getProperty("GLOSSARY_SHEET_ID") ? 'Set' : 'NOT SET (Optional)');
+  console.log('AZURE_API_KEY:', PropertiesService.getScriptProperties().getProperty("AZURE_API_KEY") ? 'Set' : 'NOT SET');
+  console.log('AZURE_DEPLOYMENT_NAME:', PropertiesService.getScriptProperties().getProperty("AZURE_DEPLOYMENT_NAME") ? 'Set' : 'NOT SET');
+  console.log('AZURE_RESOURCE_NAME:', PropertiesService.getScriptProperties().getProperty("AZURE_RESOURCE_NAME") ? 'Set' : 'NOT SET');
+  console.log('AZURE_API_VERSION:', PropertiesService.getScriptProperties().getProperty("AZURE_API_VERSION") ? 'Set' : 'NOT SET');
   console.log('TARGET_LANGUAGE:', CONFIG.TARGET_LANGUAGE);
   console.log('DAYS_BEFORE_ARCHIVE:', CONFIG.DAYS_BEFORE_ARCHIVE);
 }
@@ -24,6 +28,10 @@ function validateConfiguration() {
   if (!PropertiesService.getScriptProperties().getProperty("CONTEXT_FOLDER_ID")) missing.push('CONTEXT_FOLDER_ID');
   if (!PropertiesService.getScriptProperties().getProperty("ARCHIVE_FOLDER_ID")) missing.push('ARCHIVE_FOLDER_ID');
   if (!PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID")) missing.push('TRANSLATION_FORM_ID');
+  if (!PropertiesService.getScriptProperties().getProperty("AZURE_API_KEY")) missing.push('AZURE_API_KEY');
+  if (!PropertiesService.getScriptProperties().getProperty("AZURE_DEPLOYMENT_NAME")) missing.push('AZURE_DEPLOYMENT_NAME');
+  if (!PropertiesService.getScriptProperties().getProperty("AZURE_RESOURCE_NAME")) missing.push('AZURE_RESOURCE_NAME');
+  if (!PropertiesService.getScriptProperties().getProperty("AZURE_API_VERSION")) missing.push('AZURE_API_VERSION');
 
   if (missing.length > 0) {
     console.error('Missing configuration:', missing.join(', '));
@@ -87,16 +95,25 @@ function getSystemStatus() {
   }
 
   // Check Properties Service
-  console.log('\n4. Properties Service / API key(s)');
+  console.log('\n4. Properties Service / Azure Configuration');
   try {
-    const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
-      if (!apiKey) {
-        console.log('API key not set');
-      } else {
-        console.log('API key set');
-      }
+    const apiKey = PropertiesService.getScriptProperties().getProperty('AZURE_API_KEY');
+    const deploymentName = PropertiesService.getScriptProperties().getProperty('AZURE_DEPLOYMENT_NAME');
+    const resourceName = PropertiesService.getScriptProperties().getProperty('AZURE_RESOURCE_NAME');
+    const apiVersion = PropertiesService.getScriptProperties().getProperty('AZURE_API_VERSION');
+    
+    console.log('AZURE_API_KEY:', apiKey ? 'Set' : 'NOT SET');
+    console.log('AZURE_DEPLOYMENT_NAME:', deploymentName ? 'Set' : 'NOT SET');
+    console.log('AZURE_RESOURCE_NAME:', resourceName ? 'Set' : 'NOT SET');
+    console.log('AZURE_API_VERSION:', apiVersion ? 'Set' : 'NOT SET');
+    
+    if (apiKey && deploymentName && resourceName && apiVersion) {
+      console.log('Azure configuration complete');
+    } else {
+      console.log('Azure configuration incomplete');
+    }
   } catch (error) {
-    console.error('Error retrieving API key:', error.message);
+    console.error('Error retrieving Azure configuration:', error.message);
   }
 
   // Check Glossary Sheet
