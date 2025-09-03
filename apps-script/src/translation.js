@@ -116,6 +116,9 @@ function translateFormSubmission(submissionId) {
           translationResult.translatedText,
           textToTranslate,
           prompt,
+          // With Azure, the model is associated with the deployment of whatever resource you created, not specified
+          // at request time. In order to ascertain the model associated with whatever deployment is being used,
+          // we'll log what comes back with the translation response
           translationResult.fullResponse.model
       )
       console.log(`Successfully translated ${requestName} for submission id ${submissionId}`)
@@ -218,9 +221,6 @@ function translateTextWithAzure(content, customPrompt) {
     }
 
     const apiKey = PropertiesService.getScriptProperties().getProperty('AZURE_API_KEY');
-    // We should instruct Arizona to name the deployment after the model being used in the deployment for clarity,
-    // so we can log later in the tracker. In Azure, you don't specify the LLM model in the API request -- it's determined
-    // by the model selected when you deploy the resource
     const deploymentName = PropertiesService.getScriptProperties().getProperty('AZURE_DEPLOYMENT_NAME');
     const resourceName = PropertiesService.getScriptProperties().getProperty('AZURE_RESOURCE_NAME');
     const azureApiVersion = PropertiesService.getScriptProperties().getProperty('AZURE_API_VERSION');
