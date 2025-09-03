@@ -3,7 +3,6 @@ const CONFIG = {
   TARGET_LANGUAGE: 'Spanish',
 
   // Translation settings
-  OPENAI_MODEL: 'gpt-4.1',
   MAX_TOKENS: 4000,
   TEMPERATURE: 0,
   

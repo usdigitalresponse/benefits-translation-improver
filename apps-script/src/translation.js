@@ -106,7 +106,7 @@ function translateFormSubmission(submissionId) {
     // Latency tracking; a bit hacky but it works!
     const startTime = new Date().getTime();
     const prompt = getTranslationPrompt(contentType)
-    const translationResult = translateText(textToTranslate, prompt)
+    const translationResult = translateTextWithAzure(textToTranslate, prompt)
     const endTime = new Date().getTime();
     const translationDuration = endTime - startTime;
     
@@ -115,7 +115,8 @@ function translateFormSubmission(submissionId) {
           requestName,
           translationResult.translatedText,
           textToTranslate,
-          prompt
+          prompt,
+          translationResult.fullResponse.model
       )
       console.log(`Successfully translated ${requestName} for submission id ${submissionId}`)
       logTranslationInformation({
@@ -195,7 +196,7 @@ function getGlossaryFromSheet() {
 /**
  * Translate text using Azure API with custom prompt
  */
-function translateText(content, customPrompt) {
+function translateTextWithAzure(content, customPrompt) {
   try {
     // Get glossary terms if available
     const glossaryTerms = getGlossaryFromSheet();
@@ -217,18 +218,30 @@ function translateText(content, customPrompt) {
     }
 
     const apiKey = PropertiesService.getScriptProperties().getProperty('AZURE_API_KEY');
-    // TODO format to take the version number and then put that in the document rather than OpenAI model
-    const azureUrl = PropertiesService.getScriptProperties().getProperty('AZURE_API_URL')
+    // We should instruct Arizona to name the deployment after the model being used in the deployment for clarity,
+    // so we can log later in the tracker. In Azure, you don't specify the LLM model in the API request -- it's determined
+    // by the model selected when you deploy the resource
+    const deploymentName = PropertiesService.getScriptProperties().getProperty('AZURE_DEPLOYMENT_NAME');
+    const resourceName = PropertiesService.getScriptProperties().getProperty('AZURE_RESOURCE_NAME');
+    const azureApiVersion = PropertiesService.getScriptProperties().getProperty('AZURE_API_VERSION');
+
     if (!apiKey) {
       throw new Error('AZURE_API_KEY not found in script properties');
     }
-
-    if (!azureUrl) {
-      throw new Error('AZURE_API_URL not found in script properties')
+    if (!deploymentName) {
+      throw new Error('AZURE_DEPLOYMENT_NAME not found in script properties');
+    }
+    if (!resourceName) {
+      throw new Error('AZURE_RESOURCE_NAME not found in script properties');
+    }
+    if (!azureApiVersion) {
+      throw new Error('AZURE_API_VERSION not found in script properties');
     }
 
+    const azureEndpoint = `https://${resourceName}.openai.azure.com/openai/deployments/${deploymentName}/chat/completions?api-version=${azureApiVersion}`;
+
     const response = UrlFetchApp.fetch(
-        azureUrl,
+        azureEndpoint,
         {
           method: 'POST',
           headers: {

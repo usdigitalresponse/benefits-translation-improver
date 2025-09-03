@@ -2,7 +2,7 @@
  * Create a new document with the translated content, plus supplemental information organized by heading
  * @return {string} The URL of the created document, or null if creation failed
  */
-function createTemplatedTranslationDocument(originalName, translation, originalText, prompt) {
+function createTemplatedTranslationDocument(originalName, translation, originalText, prompt, model) {
   try {
     const outputFolder = DriveApp.getFolderById(
         PropertiesService.getScriptProperties().getProperty("OUTPUT_FOLDER_ID")
@@ -16,7 +16,7 @@ function createTemplatedTranslationDocument(originalName, translation, originalT
     const sections = [
       { heading: "Translated Text", content: translation },
       { heading: "Original Text", content: originalText },
-      { heading: "Model", content: CONFIG.OPENAI_MODEL },
+      { heading: "Model", content: model || "Not Determined" },
       { heading: "Prompt", content: prompt }
     ];
 
