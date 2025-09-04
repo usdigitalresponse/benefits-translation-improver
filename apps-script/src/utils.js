@@ -14,6 +14,8 @@ function checkConfiguration() {
   console.log('AZURE_DEPLOYMENT_NAME:', PropertiesService.getScriptProperties().getProperty("AZURE_DEPLOYMENT_NAME") ? 'Set' : 'NOT SET');
   console.log('AZURE_RESOURCE_NAME:', PropertiesService.getScriptProperties().getProperty("AZURE_RESOURCE_NAME") ? 'Set' : 'NOT SET');
   console.log('AZURE_API_VERSION:', PropertiesService.getScriptProperties().getProperty("AZURE_API_VERSION") ? 'Set' : 'NOT SET');
+  console.log('GEMINI_API_KEY:', PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY") ? 'Set' : 'NOT SET');
+  console.log('GEMINI_VERSION:', PropertiesService.getScriptProperties().getProperty("GEMINI_VERSION") ? 'Set' : 'NOT SET');
   console.log('TARGET_LANGUAGE:', CONFIG.TARGET_LANGUAGE);
   console.log('DAYS_BEFORE_ARCHIVE:', CONFIG.DAYS_BEFORE_ARCHIVE);
 }
@@ -95,25 +97,38 @@ function getSystemStatus() {
   }
 
   // Check Properties Service
-  console.log('\n4. Properties Service / Azure Configuration');
+  console.log('\n4. Properties Service / API Configuration');
   try {
-    const apiKey = PropertiesService.getScriptProperties().getProperty('AZURE_API_KEY');
+    const azureApiKey = PropertiesService.getScriptProperties().getProperty('AZURE_API_KEY');
     const deploymentName = PropertiesService.getScriptProperties().getProperty('AZURE_DEPLOYMENT_NAME');
     const resourceName = PropertiesService.getScriptProperties().getProperty('AZURE_RESOURCE_NAME');
     const apiVersion = PropertiesService.getScriptProperties().getProperty('AZURE_API_VERSION');
+    const geminiApiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
     
-    console.log('AZURE_API_KEY:', apiKey ? 'Set' : 'NOT SET');
-    console.log('AZURE_DEPLOYMENT_NAME:', deploymentName ? 'Set' : 'NOT SET');
-    console.log('AZURE_RESOURCE_NAME:', resourceName ? 'Set' : 'NOT SET');
-    console.log('AZURE_API_VERSION:', apiVersion ? 'Set' : 'NOT SET');
+    console.log('Azure Configuration:');
+    console.log('  AZURE_API_KEY:', azureApiKey ? 'Set' : 'NOT SET');
+    console.log('  AZURE_DEPLOYMENT_NAME:', deploymentName ? 'Set' : 'NOT SET');
+    console.log('  AZURE_RESOURCE_NAME:', resourceName ? 'Set' : 'NOT SET');
+    console.log('  AZURE_API_VERSION:', apiVersion ? 'Set' : 'NOT SET');
     
-    if (apiKey && deploymentName && resourceName && apiVersion) {
-      console.log('Azure configuration complete');
+    if (azureApiKey && deploymentName && resourceName && apiVersion) {
+      console.log('  Azure configuration complete');
     } else {
-      console.log('Azure configuration incomplete');
+      console.log('  Azure configuration incomplete');
+    }
+    
+    console.log('Gemini Configuration:');
+    const geminiVersion = PropertiesService.getScriptProperties().getProperty('GEMINI_VERSION');
+    console.log('  GEMINI_API_KEY:', geminiApiKey ? 'Set' : 'NOT SET');
+    console.log('  GEMINI_VERSION:', geminiVersion ? `Set (${geminiVersion})` : 'NOT SET');
+    
+    if (geminiApiKey && geminiVersion) {
+      console.log('  Gemini configuration complete');
+    } else {
+      console.log('  Gemini configuration incomplete');
     }
   } catch (error) {
-    console.error('Error retrieving Azure configuration:', error.message);
+    console.error('Error retrieving API configuration:', error.message);
   }
 
   // Check Glossary Sheet

@@ -63,7 +63,55 @@ function getTranslationPrompt(contentType) {
  * Get default translation prompt
  */
 function getDefaultPrompt() {
-  return `You are a professional translator. Please translate the following English text to ${CONFIG.TARGET_LANGUAGE}. Please provide only the translation, no explanations.`;
+  return `
+    You are a professional translator. Please translate the following English text to ${CONFIG.TARGET_LANGUAGE}.
+    Please provide only the translation, no explanations.
+   `;
+}
+
+/**
+ * Parse form response and extract translation request data
+ * @param {string} submissionId - The form submission ID
+ * @returns {Object} Object containing all form data needed for translation
+ */
+function parseFormResponse(submissionId) {
+  const form = FormApp.openById(PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID"));
+  const formResponse = form.getResponse(submissionId);
+  const submissionTimestamp = formResponse.getTimestamp();
+  const respondentEmail = formResponse.getRespondentEmail();
+  
+  const itemResponses = formResponse.getItemResponses();
+  let textToTranslate = '';
+  let requestName = '';
+  let contentType = '';
+
+  itemResponses.forEach(itemResponse => {
+    const response = itemResponse.getResponse();
+    switch (itemResponse.getItem().getTitle()) {
+      case CONFIG.TRANSLATED_TEXT_FORM_ITEM_NAME:
+        textToTranslate = response;
+        console.log(`Text To Translate: ${textToTranslate}`);
+        break;
+      case CONFIG.REQUEST_NAME_FORM_ITEM_NAME:
+        requestName = response;
+        console.log(`Request Name: ${requestName}`);
+        break;
+      case CONFIG.CONTENT_TYPE_FORM_ITEM_NAME:
+        contentType = response;
+        console.log(`Content Type: ${contentType}`);
+        break;
+      default:
+        break;
+    }
+  });
+
+  return {
+    textToTranslate,
+    requestName,
+    contentType,
+    submissionTimestamp,
+    respondentEmail
+  };
 }
 
 /**
@@ -73,55 +121,51 @@ function getDefaultPrompt() {
  * -- run the translation
  * */
 function translateFormSubmission(submissionId) {
-  const form = FormApp.openById(PropertiesService.getScriptProperties().getProperty("TRANSLATION_FORM_ID"));
-  const formResponse = form.getResponse(submissionId);
-  const itemResponses = formResponse.getItemResponses();
-  const submissionTimestamp = formResponse.getTimestamp();
-  const respondentEmail = formResponse.getRespondentEmail();
-  let textToTranslate = ''
-  let requestName = ''
-  let contentType = ''
-
-  itemResponses.forEach(itemResponse => {
-    const response = itemResponse.getResponse()
-    switch (itemResponse.getItem().getTitle()) {
-      case CONFIG.TRANSLATED_TEXT_FORM_ITEM_NAME:
-        textToTranslate = response;
-        console.log(`Text To Translate: ${textToTranslate}`)
-        break;
-      case CONFIG.REQUEST_NAME_FORM_ITEM_NAME:
-        requestName = response;
-        console.log(`Request Name: ${requestName}`)
-        break;
-      case CONFIG.CONTENT_TYPE_FORM_ITEM_NAME:
-        contentType = response;
-        console.log(`Content Type: ${contentType}`)
-        break;
-      default:
-        break;
-    }
-  });
+  // Set this to true to use Gemini, false to use Azure
+  const useGemini = false;
+  
+  const {
+    textToTranslate,
+    requestName,
+    contentType,
+    submissionTimestamp,
+    respondentEmail
+  } = parseFormResponse(submissionId);
 
   try {
     // Latency tracking; a bit hacky but it works!
     const startTime = new Date().getTime();
-    const prompt = getTranslationPrompt(contentType)
-    const translationResult = translateTextWithAzure(textToTranslate, prompt)
+    const prompt = getTranslationPrompt(contentType);
+    const fullPrompt = buildFullPrompt(textToTranslate, prompt);
+    
+    // Call the appropriate translation API based on the flag
+    const translationResult = useGemini 
+      ? translateTextWithGemini(fullPrompt)
+      : translateTextWithAzure(fullPrompt);
+    
     const endTime = new Date().getTime();
     const translationDuration = endTime - startTime;
     
     if (translationResult && translationResult.translatedText) {
+      // Extract model name based on which API was used
+      const modelName = useGemini 
+        ? translationResult.fullResponse.modelVersion 
+        : translationResult.fullResponse.model;
+      
       const documentUrl = createTemplatedTranslationDocument(
           requestName,
           translationResult.translatedText,
           textToTranslate,
           prompt,
-          // With Azure, the model is associated with the deployment of whatever resource you created, not specified
-          // at request time. In order to ascertain the model associated with whatever deployment is being used,
-          // we'll log what comes back with the translation response
-          translationResult.fullResponse.model
+          modelName
       )
       console.log(`Successfully translated ${requestName} for submission id ${submissionId}`)
+      
+      // Select the correct column mapping for the tracker based on the API used
+      const columnMapping = useGemini 
+        ? CONFIG.GEMINI_TRACKING_SHEET_COLUMNS 
+        : CONFIG.TRACKING_SHEET_COLUMNS;
+      
       logTranslationInformation({
         submissionTimestamp,
         respondentEmail,
@@ -134,7 +178,7 @@ function translateFormSubmission(submissionId) {
         translationDuration,
         fullResponse: translationResult.fullResponse,
         documentUrl
-      });
+      }, columnMapping);
     }
   } catch (error) {
     console.error(`Error processing request ${requestName} for submission id ${submissionId}: `, error)
@@ -196,16 +240,12 @@ function getGlossaryFromSheet() {
   }
 }
 
-/**
- * Translate text using Azure API with custom prompt
- */
-function translateTextWithAzure(content, customPrompt) {
-  try {
-    // Get glossary terms if available
+function buildFullPrompt(content, customPrompt) {
+      // Get glossary terms if available
     const glossaryTerms = getGlossaryFromSheet();
-    
+
     // Build the full prompt with lexicon if available
-    let fullPrompt = customPrompt;
+    let fullPrompt;
     if (glossaryTerms) {
       fullPrompt = `${customPrompt}
         
@@ -219,6 +259,14 @@ function translateTextWithAzure(content, customPrompt) {
         Text to translate:
         ${content}`;
     }
+    return fullPrompt;
+}
+
+/**
+ * Translate text using Azure API with full prompt
+ */
+function translateTextWithAzure(fullPrompt) {
+  try {
 
     const apiKey = PropertiesService.getScriptProperties().getProperty('AZURE_API_KEY');
     const deploymentName = PropertiesService.getScriptProperties().getProperty('AZURE_DEPLOYMENT_NAME');
@@ -270,18 +318,79 @@ function translateTextWithAzure(content, customPrompt) {
     }
     
   } catch (error) {
-    console.error('Error calling OpenAI API:', error);
+    console.error('Error calling Azure OpenAI API:', error);
     return null;
   }
 }
 
-function logTranslationInformation(requestAndResponseData) {
+/**
+ * Translate text using Gemini API with full prompt
+ */
+function translateTextWithGemini(fullPrompt) {
+  try {
+
+    const apiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+    const geminiVersion = PropertiesService.getScriptProperties().getProperty('GEMINI_VERSION');
+    
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEY not found in script properties');
+    }
+    if (!geminiVersion) {
+      throw new Error('GEMINI_VERSION not found in script properties');
+    }
+
+    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${geminiVersion}:generateContent`;
+
+    const response = UrlFetchApp.fetch(
+        geminiEndpoint,
+        {
+          method: 'POST',
+          headers: {
+            'x-goog-api-key': apiKey,
+            'Content-Type': 'application/json'
+          },
+          payload: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: fullPrompt
+                  }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: CONFIG.TEMPERATURE,
+              maxOutputTokens: CONFIG.MAX_TOKENS
+            }
+          })
+    });
+
+    const data = JSON.parse(response.getContentText());
+    
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      return {
+        translatedText: data.candidates[0].content.parts[0].text.trim(),
+        fullResponse: data
+      };
+    } else {
+      console.error('Unexpected Gemini API response:', data);
+      return null;
+    }
+    
+  } catch (error) {
+    console.error('Error calling Gemini API:', error);
+    return null;
+  }
+}
+
+function logTranslationInformation(requestAndResponseData, columnMapping = CONFIG.TRACKING_SHEET_COLUMNS) {
   try {
     const sheet = SpreadsheetApp.openById(
         PropertiesService.getScriptProperties().getProperty("RESPONSE_AGGREGATION_TRACKER_SHEET_ID")
     ).getActiveSheet();
     
-    const rowData = CONFIG.TRACKING_SHEET_COLUMNS.map(column => {
+    const rowData = columnMapping.map(column => {
       // Check if this is a nested path (e.g., "fullResponse.usage.total_tokens")
       if (column.dataKey.includes('.')) {
         const keys = column.dataKey.split('.');

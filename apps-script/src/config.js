@@ -36,5 +36,22 @@ const CONFIG = {
     { header: 'Completion Tokens', dataKey: 'fullResponse.usage.completion_tokens' },
     { header: 'Total Tokens', dataKey: 'fullResponse.usage.total_tokens' },
     // Add more columns here as needed
-  ]
+  ],
+  // To use in the Gemini method since the shape of the response will be different
+  GEMINI_TRACKING_SHEET_COLUMNS: [
+    { header: 'Submission Timestamp', dataKey: 'submissionTimestamp' },
+    { header: 'Respondent Email', dataKey: 'respondentEmail' },
+    { header: 'Request Name', dataKey: 'requestName' },
+    { header: 'Content Type', dataKey: 'contentType' },
+    { header: 'Requested Word Count', dataKey: 'requestedWordCount' },
+    { header: 'Translated Word Count', dataKey: 'translatedWordCount' },
+    { header: 'Translated Document URL', dataKey: 'documentUrl' },
+    { header: 'Translation Duration (ms)', dataKey: 'translationDuration' },
+    // Gemini-specific response structure mappings
+    { header: 'AI Model', dataKey: 'fullResponse.modelVersion' },
+    { header: 'Prompt Tokens', dataKey: 'fullResponse.usageMetadata.promptTokenCount' },
+    { header: 'Completion Tokens', dataKey: 'fullResponse.usageMetadata.candidatesTokenCount' },
+    { header: 'Total Tokens', dataKey: 'fullResponse.usageMetadata.totalTokenCount' },
+    // Add more columns here as needed
+  ],
 };
