@@ -1,6 +1,6 @@
 # Apps Script Translation App
 
-A Google Apps Script for form-based translation with automatic archiving, leveraging Google Drive folders and OpenAI API.
+A Google Apps Script for form-based translation with automatic archiving, leveraging Google Drive folders and Azure API.
 
 ## Setup
 
@@ -58,7 +58,10 @@ Run and test functions directly in the Apps Script editor at script.google.com f
 1. Load the script in Apps Script editor
 2. **Set timezone**: Go to Project Settings → adjust project timezone (recommended: "America/Phoenix" for Arizona)
 3. **Set properties referenced in the script**: Go to Project Settings -> Script properties -> Edit / add script properties
-   - `OPENAI_API_KEY`: Your OpenAI API key
+   - `AZURE_API_KEY`: Your Azure API key
+   - `AZURE_API_VERSION`: The version of the Azure REST API to use, see docs [here](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference)
+   - `AZURE_RESOURCE_NAME`: The name of your Azure OpenAI resource, can be found in your Azure portal (e.g. translation-resource)
+   - `AZURE_DEPLOYMENT_NAME`: The deployment name for your specific model deployment; docs for this can be found [here](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/create-resource?pivots=web-portal)
    - `OUTPUT_FOLDER_ID`: Where translated documents will be created
    - `CONTEXT_FOLDER_ID`: Where your prompt document lives
    - `ARCHIVE_FOLDER_ID`: Where old translations are moved
@@ -68,8 +71,8 @@ Run and test functions directly in the Apps Script editor at script.google.com f
 
 ### Create Required Components:
 1. **Google Form** with these fields (exact names matter):
-   - "Please enter the text you want to translate" (paragraph text)
-   - "Translation Request Name" (short text)
+   - "Please enter or copy/paste the text you want to translate or evaluate (max 3,000 words)" (paragraph text)
+   - "Please enter a descriptive file name you will remember to locate your translation/evaluation." (short text)
    - "What is the type of content you want to translate?" (dropdown with options like "Public outreach flyer [TAB: t.1yn59ynq1uqa]")
 
 2. **Prompt Document** in your context folder:
