@@ -11,7 +11,7 @@ const CONFIG = {
   PROMPT_DOCUMENT_NAME: 'Arizona SNAP Translation Prompt — Modular Workflow Tool for Translators',
   LEXICON_SHEET_NAME: 'Curated List',
   FORM_TRIGGER_NAME: 'translateOnFormSubmission',
-  TRANSLATED_TEXT_FORM_ITEM_NAME: 'Please enter the text you want to translate or evaluate (max. 3000 words)',
+  TRANSLATED_TEXT_FORM_ITEM_NAME: 'Please enter or copy/paste the text you want to translate or evaluate (max 3,000 words)',
   REQUEST_NAME_FORM_ITEM_NAME: 'Please enter a descriptive file name you will remember to locate your translation/evaluation.',
   CONTENT_TYPE_FORM_ITEM_NAME: 'What is the type of content you want to translate?',
   DAYS_BEFORE_ARCHIVE: 1,
