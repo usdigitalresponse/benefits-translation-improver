@@ -44,10 +44,13 @@ function validateConfiguration() {
   
   // Check optional configurations
   const glossaryConfigured = PropertiesService.getScriptProperties().getProperty("GLOSSARY_SHEET_ID");
+  
   if (glossaryConfigured) {
     console.log('Optional: Glossary sheet is configured');
+    console.log(`  - Will look for lexicon in "${CONFIG.LEXICON_SHEET_NAME}" tab`);
+    console.log(`  - Will look for SNAP terms in "${CONFIG.SNAP_TERMS_TAB_NAME}" tab`);
   } else {
-    console.log('Optional: Glossary sheet not configured (translations will proceed without glossary)');
+    console.log('Optional: Glossary sheet not configured (translations will proceed without glossary or SNAP terms)');
   }
   
   return true;
@@ -135,18 +138,31 @@ function getSystemStatus() {
   console.log('\n5. Glossary Sheet (Optional):');
   try {
     const glossarySheetId = PropertiesService.getScriptProperties().getProperty('GLOSSARY_SHEET_ID');
+    
     if (!glossarySheetId) {
       console.log('No glossary sheet configured (optional feature)');
     } else {
       const spreadsheet = SpreadsheetApp.openById(glossarySheetId);
-      const sheet = spreadsheet.getSheetByName('Curated List');
-      if (sheet) {
-        const dataRange = sheet.getDataRange();
+      console.log(`Glossary sheet accessible: ${spreadsheet.getName()}`);
+      
+      // Check Curated List tab
+      const curatedSheet = spreadsheet.getSheetByName(CONFIG.LEXICON_SHEET_NAME);
+      if (curatedSheet) {
+        const dataRange = curatedSheet.getDataRange();
         const numRows = dataRange.getNumRows() - 1;
-        console.log(`Glossary sheet accessible: ${spreadsheet.getName()}`);
-        console.log(`  - "Curated List" tab found with ${numRows} term pairs (excluding header)`);
+        console.log(`  - "${CONFIG.LEXICON_SHEET_NAME}" tab found with ${numRows} term pairs (excluding header)`);
       } else {
-        console.log(`Glossary sheet accessible but "Curated List" tab not found`);
+        console.log(`  - "${CONFIG.LEXICON_SHEET_NAME}" tab not found`);
+      }
+      
+      // Check SNAP Terms tab
+      const snapSheet = spreadsheet.getSheetByName(CONFIG.SNAP_TERMS_TAB_NAME);
+      if (snapSheet) {
+        const snapDataRange = snapSheet.getDataRange();
+        const snapNumRows = snapDataRange.getNumRows() - 1;
+        console.log(`  - "${CONFIG.SNAP_TERMS_TAB_NAME}" tab found with ${snapNumRows} SNAP terms (excluding header)`);
+      } else {
+        console.log(`  - "${CONFIG.SNAP_TERMS_TAB_NAME}" tab not found`);
       }
     }
   } catch (error) {
