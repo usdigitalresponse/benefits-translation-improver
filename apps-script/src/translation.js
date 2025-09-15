@@ -240,25 +240,101 @@ function getGlossaryFromSheet() {
   }
 }
 
-function buildFullPrompt(content, customPrompt) {
-      // Get glossary terms if available
-    const glossaryTerms = getGlossaryFromSheet();
+/**
+ * Fetch SNAP terms with definitions from Google Sheets
+ * @returns {string} Formatted SNAP terms string for prompt inclusion, or empty string if unavailable
+ */
+function getSNAPTermsFromSheet() {
+  try {
+    const glossarySheetId = PropertiesService.getScriptProperties().getProperty('GLOSSARY_SHEET_ID');
+    
+    if (!glossarySheetId) {
+      console.log('No GLOSSARY_SHEET_ID configured in script properties');
+      return '';
+    }
 
-    // Build the full prompt with lexicon if available
-    let fullPrompt;
+    const spreadsheet = SpreadsheetApp.openById(glossarySheetId);
+    const sheet = spreadsheet.getSheetByName(CONFIG.SNAP_TERMS_TAB_NAME);
+    
+    if (!sheet) {
+      console.log(`Sheet "${CONFIG.SNAP_TERMS_TAB_NAME}" not found in glossary spreadsheet`);
+      return '';
+    }
+
+    const data = sheet.getDataRange().getValues();
+    
+    if (data.length <= 1) {
+      console.log('No SNAP terms data found (only header row or empty)');
+      return '';
+    }
+    
+    // Build SNAP terms string with all 4 columns of context
+    // Column A: English Term, Column B: AZ approved English definition
+    // Column C: Spanish term, Column D: Spanish definition
+    const snapTerms = [];
+    for (let i = 1; i < data.length; i++) {
+      const englishTerm = data[i][0]?.toString().trim();
+      const englishDef = data[i][1]?.toString().trim();
+      const spanishTerm = data[i][2]?.toString().trim();
+      const spanishDef = data[i][3]?.toString().trim();
+      
+      if (englishTerm || spanishTerm) {
+        let termEntry = [];
+        if (englishTerm) termEntry.push(`English Term: ${englishTerm}`);
+        if (englishDef) termEntry.push(`English Definition: ${englishDef}`);
+        if (spanishTerm) termEntry.push(`Spanish Term: ${spanishTerm}`);
+        if (spanishDef) termEntry.push(`Spanish Definition: ${spanishDef}`);
+        
+        if (termEntry.length > 0) {
+          snapTerms.push(termEntry.join('\n'));
+        }
+      }
+    }
+    
+    if (snapTerms.length === 0) {
+      console.log('No valid SNAP terms found');
+      return '';
+    }
+    
+    console.log(`Loaded ${snapTerms.length} SNAP terms with definitions`);
+    return snapTerms.join('\n\n');
+    
+  } catch (error) {
+    console.error('Error fetching SNAP terms from sheet:', error);
+    return '';
+  }
+}
+
+function buildFullPrompt(content, customPrompt) {
+    // Get glossary terms and SNAP terms if available
+    const glossaryTerms = getGlossaryFromSheet();
+    const snapTerms = getSNAPTermsFromSheet();
+
+    // Build the full prompt with lexicon and SNAP terms if available
+    let fullPrompt = customPrompt;
+    
+    // Add glossary if available
     if (glossaryTerms) {
-      fullPrompt = `${customPrompt}
+      fullPrompt += `
         
         Please use this lexicon for consistent terminology:
-        ${glossaryTerms}
+        ${glossaryTerms}`;
+    }
+    
+    // Add SNAP terms with definitions if available
+    if (snapTerms) {
+      fullPrompt += `
+        
+        Please reference these SNAP program terms and their official definitions:
+        ${snapTerms}`;
+    }
+    
+    // Add the text to translate
+    fullPrompt += `
         
         Text to translate:
         ${content}`;
-    } else {
-      fullPrompt = `${customPrompt}
-        Text to translate:
-        ${content}`;
-    }
+    
     return fullPrompt;
 }
 
