@@ -55,6 +55,61 @@ function markAsProcessed(file) {
 }
 
 /**
+ * Create an error document when translation fails
+ * @param {string} requestName - The name of the request
+ * @param {string} originalText - The original text that failed to translate
+ * @param {string} errorMessage - The error message
+ * @param {string} timestamp - When the error occurred
+ * @return {string} The URL of the error document
+ */
+function createErrorDocument(requestName, originalText, errorMessage, timestamp) {
+  try {
+    const outputFolder = DriveApp.getFolderById(
+        PropertiesService.getScriptProperties().getProperty("OUTPUT_FOLDER_ID")
+    );
+    
+    const errorDocName = `${requestName} - Translation Error`;
+    const newDoc = DocumentApp.create(errorDocName);
+    const newDocFile = DriveApp.getFileById(newDoc.getId());
+    const newDocBody = newDoc.getBody();
+    
+    // Add error title
+    const title = newDocBody.appendParagraph('Translation Error');
+    title.setHeading(DocumentApp.ParagraphHeading.HEADING1);
+    title.setBold(true);
+    
+    // Add error details
+    const sections = [
+      { heading: "Error Details", content: errorMessage },
+      { heading: "Request Name", content: requestName },
+      { heading: "Timestamp", content: timestamp ? timestamp.toString() : new Date().toString() },
+      { heading: "Original Text (First 1000 characters)", content: originalText ? originalText.substring(0, 1000) : 'No text provided' }
+    ];
+    
+    sections.forEach(section => {
+      const header = newDocBody.appendParagraph(section.heading);
+      header.setHeading(DocumentApp.ParagraphHeading.HEADING2);
+      newDocBody.appendParagraph(section.content);
+    });
+    
+    // Add troubleshooting tips
+    const tipsHeader = newDocBody.appendParagraph('Troubleshooting Tips');
+    tipsHeader.setHeading(DocumentApp.ParagraphHeading.HEADING2);
+    newDocBody.appendParagraph('• Verify the text length is within limits (3000 words)');
+    newDocBody.appendParagraph('• Try again in a few minutes if this is a temporary API issue');
+    newDocBody.appendParagraph('• Contact your administrator if the problem persists');
+    
+    newDocFile.moveTo(outputFolder);
+    console.log(`Created error document: ${errorDocName}`);
+    
+    return newDoc.getUrl();
+  } catch (error) {
+    console.error('Error creating error document: ', error);
+    return null;
+  }
+}
+
+/**
  * Find the required translation folders by name (run this to find your folder IDs to plug into config.js)
  */
 function getFolderIds() {
