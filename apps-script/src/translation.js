@@ -146,7 +146,42 @@ function translateFormSubmission(submissionId) {
     const endTime = new Date().getTime();
     const translationDuration = endTime - startTime;
     
-    if (translationResult && translationResult.translatedText) {
+    // Check if translation was successful or had an error
+    if (translationResult && translationResult.error) {
+      // Translation failed - create error document
+      console.error(`Translation failed for ${requestName}: ${translationResult.errorMessage}`);
+      
+      const errorDocUrl = createErrorDocument(
+        requestName, 
+        textToTranslate, 
+        translationResult.errorMessage,
+        submissionTimestamp
+      );
+      
+      // Select the correct column mapping for the tracker based on the API used
+      const columnMapping = useGemini 
+        ? CONFIG.GEMINI_TRACKING_SHEET_COLUMNS 
+        : CONFIG.TRACKING_SHEET_COLUMNS;
+      
+      // Log the error to tracking sheet
+      logTranslationInformation({
+        submissionTimestamp,
+        respondentEmail,
+        requestName,
+        contentType,
+        textToTranslate,
+        translatedText: '',
+        requestedWordCount: textToTranslate.trim().split(WORD_COUNT_REGEX).length,
+        translatedWordCount: 0,
+        translationDuration,
+        fullResponse: null,
+        documentUrl: errorDocUrl || 'Error document creation failed',
+        errored: 'Yes',
+        errorMessage: translationResult.errorMessage
+      }, columnMapping);
+      
+    } else if (translationResult && translationResult.translatedText) {
+      // Translation succeeded
       // Extract model name based on which API was used
       const modelName = useGemini 
         ? translationResult.fullResponse.modelVersion 
@@ -177,11 +212,71 @@ function translateFormSubmission(submissionId) {
         translatedWordCount: translationResult.translatedText.trim().split(WORD_COUNT_REGEX).length,
         translationDuration,
         fullResponse: translationResult.fullResponse,
-        documentUrl
+        documentUrl,
+        errored: 'No',
+        errorMessage: ''
+      }, columnMapping);
+    } else {
+      // Unexpected result format
+      console.error(`Unexpected translation result for ${requestName}`);
+      
+      const errorDocUrl = createErrorDocument(
+        requestName, 
+        textToTranslate, 
+        'Unexpected translation result format',
+        submissionTimestamp
+      );
+      
+      const columnMapping = useGemini 
+        ? CONFIG.GEMINI_TRACKING_SHEET_COLUMNS 
+        : CONFIG.TRACKING_SHEET_COLUMNS;
+      
+      logTranslationInformation({
+        submissionTimestamp,
+        respondentEmail,
+        requestName,
+        contentType,
+        textToTranslate,
+        translatedText: '',
+        requestedWordCount: textToTranslate.trim().split(WORD_COUNT_REGEX).length,
+        translatedWordCount: 0,
+        translationDuration,
+        fullResponse: null,
+        documentUrl: errorDocUrl || 'Error document creation failed',
+        errored: 'Yes',
+        errorMessage: 'Unexpected translation result format'
       }, columnMapping);
     }
   } catch (error) {
     console.error(`Error processing request ${requestName} for submission id ${submissionId}: `, error)
+    
+    // Create error document for uncaught errors
+    const errorDocUrl = createErrorDocument(
+      requestName, 
+      textToTranslate, 
+      error.toString(),
+      submissionTimestamp
+    );
+    
+    const columnMapping = useGemini 
+      ? CONFIG.GEMINI_TRACKING_SHEET_COLUMNS 
+      : CONFIG.TRACKING_SHEET_COLUMNS;
+    
+    logTranslationInformation({
+      submissionTimestamp,
+      respondentEmail,
+      requestName,
+      contentType,
+      textToTranslate,
+      translatedText: '',
+      requestedWordCount: textToTranslate ? textToTranslate.trim().split(WORD_COUNT_REGEX).length : 0,
+      translatedWordCount: 0,
+      translationDuration: new Date().getTime() - startTime,
+      fullResponse: null,
+      documentUrl: errorDocUrl || 'Error document creation failed',
+      errored: 'Yes',
+      errorMessage: error.toString()
+    }, columnMapping);
   }
 }
 
@@ -386,16 +481,28 @@ function translateTextWithAzure(fullPrompt) {
     if (data.choices && data.choices[0]) {
       return {
         translatedText: data.choices[0].message.content.trim(),
-        fullResponse: data
+        fullResponse: data,
+        error: false,
+        errorMessage: null
       };
     } else {
       console.error('Unexpected API response:', data);
-      return null;
+      return {
+        translatedText: null,
+        fullResponse: null,
+        error: true,
+        errorMessage: 'Unexpected API response format'
+      };
     }
     
   } catch (error) {
     console.error('Error calling Azure OpenAI API:', error);
-    return null;
+    return {
+      translatedText: null,
+      fullResponse: null,
+      error: true,
+      errorMessage: error.toString()
+    };
   }
 }
 
@@ -447,16 +554,28 @@ function translateTextWithGemini(fullPrompt) {
     if (data.candidates && data.candidates[0] && data.candidates[0].content) {
       return {
         translatedText: data.candidates[0].content.parts[0].text.trim(),
-        fullResponse: data
+        fullResponse: data,
+        error: false,
+        errorMessage: null
       };
     } else {
       console.error('Unexpected Gemini API response:', data);
-      return null;
+      return {
+        translatedText: null,
+        fullResponse: null,
+        error: true,
+        errorMessage: 'Unexpected Gemini API response format'
+      };
     }
     
   } catch (error) {
     console.error('Error calling Gemini API:', error);
-    return null;
+    return {
+      translatedText: null,
+      fullResponse: null,
+      error: true,
+      errorMessage: error.toString()
+    };
   }
 }
 

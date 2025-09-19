@@ -36,6 +36,8 @@ const CONFIG = {
     { header: 'Prompt Tokens', dataKey: 'fullResponse.usage.prompt_tokens' },
     { header: 'Completion Tokens', dataKey: 'fullResponse.usage.completion_tokens' },
     { header: 'Total Tokens', dataKey: 'fullResponse.usage.total_tokens' },
+    { header: 'Errored', dataKey: 'errored' },
+    { header: 'Error Message', dataKey: 'errorMessage' },
     // Add more columns here as needed
   ],
   // To use in the Gemini method since the shape of the response will be different
@@ -53,6 +55,8 @@ const CONFIG = {
     { header: 'Prompt Tokens', dataKey: 'fullResponse.usageMetadata.promptTokenCount' },
     { header: 'Completion Tokens', dataKey: 'fullResponse.usageMetadata.candidatesTokenCount' },
     { header: 'Total Tokens', dataKey: 'fullResponse.usageMetadata.totalTokenCount' },
+    { header: 'Errored', dataKey: 'errored' },
+    { header: 'Error Message', dataKey: 'errorMessage' },
     // Add more columns here as needed
   ],
 };

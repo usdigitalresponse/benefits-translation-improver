@@ -76,3 +76,96 @@ function testPromptLoading() {
   console.log('Translation prompt that will be used:');
   console.log(prompt);
 }
+
+/**
+ * Test error handling by simulating a failed translation
+ * This function helps verify that error documents are created and logged correctly
+ */
+function testErrorHandling() {
+  console.log('Starting error handling test...');
+  
+  // Set to true to use Gemini, false to use Azure
+  const testWithGemini = false;
+  
+  // Save original API key
+  const apiKeyProperty = testWithGemini ? 'GEMINI_API_KEY' : 'AZURE_API_KEY';
+  const originalKey = PropertiesService.getScriptProperties().getProperty(apiKeyProperty);
+  
+  try {
+    // Set an invalid API key to force an error
+    PropertiesService.getScriptProperties().setProperty(apiKeyProperty, 'INVALID_TEST_KEY');
+    
+    const mockFormData = {
+      textToTranslate: 'This is a test translation that will fail due to invalid API key.',
+      requestName: 'ERROR_TEST_' + new Date().getTime(),
+      contentType: 'Test Content',
+      submissionTimestamp: new Date(),
+      respondentEmail: 'test@example.com'
+    };
+    
+    // Temporarily override parseFormResponse to return mock data
+    const originalParseFormResponse = parseFormResponse;
+    parseFormResponse = function(submissionId) {
+      console.log('Using mock form data for testing');
+      return mockFormData;
+    };
+    
+    // Run the translation (will fail with invalid key)
+    console.log('Running translation with invalid API key...');
+    translateFormSubmission('TEST_ERROR_SUBMISSION');
+    
+    console.log('Error handling test completed. Check:');
+    console.log('1. Output folder for error document');
+    console.log('2. Tracking sheet for error row with "Yes" in Errored column');
+    
+    // Restore original parseFormResponse
+    parseFormResponse = originalParseFormResponse;
+    
+  } catch (testError) {
+    console.error('Test error:', testError);
+  } finally {
+    // Always restore the original API key
+    if (originalKey) {
+      PropertiesService.getScriptProperties().setProperty(apiKeyProperty, originalKey);
+      console.log('Original API key restored');
+    }
+  }
+}
+
+/**
+ * Test successful translation to verify normal flow still works
+ */
+function testSuccessfulTranslation() {
+  console.log('Starting successful translation test...');
+  
+  const mockFormData = {
+    textToTranslate: 'Hello, this is a test translation.',
+    requestName: 'SUCCESS_TEST_' + new Date().getTime(),
+    contentType: 'Test Content',
+    submissionTimestamp: new Date(),
+    respondentEmail: 'test@example.com'
+  };
+  
+  // Temporarily override parseFormResponse to return mock data
+  const originalParseFormResponse = parseFormResponse;
+  parseFormResponse = function(submissionId) {
+    console.log('Using mock form data for testing');
+    return mockFormData;
+  };
+  
+  try {
+    // Run the translation (should succeed with real API key)
+    console.log('Running translation with valid API key...');
+    translateFormSubmission('TEST_SUCCESS_SUBMISSION');
+    
+    console.log('Successful translation test completed. Check:');
+    console.log('1. Output folder for translated document');
+    console.log('2. Tracking sheet for row with "No" in Errored column');
+    
+  } catch (testError) {
+    console.error('Test error:', testError);
+  } finally {
+    // Restore original parseFormResponse
+    parseFormResponse = originalParseFormResponse;
+  }
+}
