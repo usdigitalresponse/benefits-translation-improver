@@ -123,6 +123,10 @@ function parseFormResponse(submissionId) {
 function translateFormSubmission(submissionId) {
   // Set this to true to use Gemini, false to use Azure
   const useGemini = false;
+  // Select the correct column mapping for the tracker based on the API used
+  const columnMapping = useGemini
+      ? CONFIG.GEMINI_TRACKING_SHEET_COLUMNS
+      : CONFIG.TRACKING_SHEET_COLUMNS;
   
   const {
     textToTranslate,
@@ -158,11 +162,6 @@ function translateFormSubmission(submissionId) {
         submissionTimestamp
       );
       
-      // Select the correct column mapping for the tracker based on the API used
-      const columnMapping = useGemini 
-        ? CONFIG.GEMINI_TRACKING_SHEET_COLUMNS 
-        : CONFIG.TRACKING_SHEET_COLUMNS;
-      
       // Log the error to tracking sheet
       logTranslationInformation({
         submissionTimestamp,
@@ -196,11 +195,6 @@ function translateFormSubmission(submissionId) {
       )
       console.log(`Successfully translated ${requestName} for submission id ${submissionId}`)
       
-      // Select the correct column mapping for the tracker based on the API used
-      const columnMapping = useGemini 
-        ? CONFIG.GEMINI_TRACKING_SHEET_COLUMNS 
-        : CONFIG.TRACKING_SHEET_COLUMNS;
-      
       logTranslationInformation({
         submissionTimestamp,
         respondentEmail,
@@ -226,11 +220,7 @@ function translateFormSubmission(submissionId) {
         'Unexpected translation result format',
         submissionTimestamp
       );
-      
-      const columnMapping = useGemini 
-        ? CONFIG.GEMINI_TRACKING_SHEET_COLUMNS 
-        : CONFIG.TRACKING_SHEET_COLUMNS;
-      
+
       logTranslationInformation({
         submissionTimestamp,
         respondentEmail,
@@ -257,10 +247,6 @@ function translateFormSubmission(submissionId) {
       error.toString(),
       submissionTimestamp
     );
-    
-    const columnMapping = useGemini 
-      ? CONFIG.GEMINI_TRACKING_SHEET_COLUMNS 
-      : CONFIG.TRACKING_SHEET_COLUMNS;
     
     logTranslationInformation({
       submissionTimestamp,
@@ -364,8 +350,10 @@ function getSNAPTermsFromSheet() {
     }
     
     // Build SNAP terms string with all 4 columns of context
-    // Column A: English Term, Column B: AZ approved English definition
-    // Column C: Spanish term, Column D: Spanish definition
+    // Column A: English Term
+    // Column B: AZ approved English definition
+    // Column C: Spanish term
+    // Column D: Spanish definition
     const snapTerms = [];
     for (let i = 1; i < data.length; i++) {
       const englishTerm = data[i][0]?.toString().trim();
